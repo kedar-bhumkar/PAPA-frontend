@@ -99,11 +99,19 @@ LIMIT 1
 
 ### Visual Enhancements
 
-#### PAPA Title
-- **Size**: Extra large (text-5xl) for maximum impact
-- **Font**: Manrope, black weight for bold appearance
-- **Effect**: Beautiful gradient from primary to lighter shades
-- **Technique**: bg-clip-text for smooth gradient rendering
+#### PAPA Title & Subtitle
+- **Title "PAPA"**:
+  - Size: Extra large (text-5xl) for maximum impact
+  - Font: Manrope, black weight for bold appearance
+  - Effect: Beautiful gradient from primary to lighter shades
+  - Technique: bg-clip-text for smooth gradient rendering
+  - Position: Centered on the page
+- **Subtitle "Persistent Ambient Personal agents"**:
+  - Size: Extra small (text-xs) for subtle appearance
+  - Font: Inter, regular weight
+  - Color: Muted foreground for secondary emphasis
+  - Position: Centered below the main title
+  - Letter spacing for readability
 
 #### Navigation Arrows
 - **Size**: 48x48px (larger for better visibility)

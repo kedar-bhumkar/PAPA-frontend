@@ -29,8 +29,8 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex items-center justify-between px-6 py-6">
-          <div>
+        <div className="container mx-auto relative flex items-center justify-center px-6 py-6">
+          <div className="text-center">
             <h1 
               className="text-5xl font-black tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent" 
               style={{ fontFamily: 'Manrope, sans-serif' }}
@@ -38,8 +38,17 @@ export default function Home() {
             >
               PAPA
             </h1>
+            <p 
+              className="text-xs text-muted-foreground mt-1 tracking-wide"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+              data-testid="text-app-subtitle"
+            >
+              Persistent Ambient Personal agents
+            </p>
           </div>
-          <ThemeToggle />
+          <div className="absolute right-6">
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
