@@ -1,11 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LucideIcon } from "lucide-react";
 
 export interface ConceptItem {
-  label: string;
-  value: string;
-  icon?: LucideIcon;
+  date: string;
+  place: string;
+  event: string;
 }
 
 export interface ConceptBoxProps {
@@ -61,24 +60,22 @@ export default function ConceptBox({
           {title}
         </h3>
 
-        {/* Items List */}
-        <div className="flex-1 space-y-4 overflow-y-auto">
+        {/* Items List - Compact single-line format */}
+        <div className="flex-1 space-y-3 overflow-y-auto">
           {items.map((item, index) => (
             <div
               key={index}
-              className="flex items-start gap-3 rounded-md bg-card/30 p-3 backdrop-blur-sm"
+              className="space-y-1 rounded-md bg-card/30 p-3 backdrop-blur-sm"
               data-testid={`item-${index}`}
             >
-              {item.icon && (
-                <item.icon className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
-              )}
-              <div className="flex-1 space-y-1">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  {item.label}
-                </p>
-                <p className="text-sm font-medium text-card-foreground">
-                  {item.value}
-                </p>
+              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
+                <span>{item.date}</span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {item.place}
+              </div>
+              <div className="text-base font-medium text-card-foreground">
+                {item.event}
               </div>
             </div>
           ))}
