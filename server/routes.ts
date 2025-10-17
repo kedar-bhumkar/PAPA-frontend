@@ -6,20 +6,21 @@ import {
   eventsResponseSchema,
   type EventData,
 } from "@shared/schema";
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, desc, sql } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get events from the latest successful event_agent record
   app.get("/api/events", async (req, res) => {
     try {
       // Select the latest successful record where agent_name='event_agent', LIMIT 1
+      // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db
         .select()
         .from(agentData)
         .where(
           and(
             eq(agentData.agentName, "event_agent"),
-            eq(agentData.status, "success")
+            sql`TRIM(${agentData.status}) = 'success'`
           )
         )
         .orderBy(desc(agentData.createdAt))

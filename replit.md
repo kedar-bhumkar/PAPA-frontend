@@ -65,21 +65,22 @@ Fetches events from the latest event_agent record.
 ```sql
 SELECT * FROM agent_output 
 WHERE agent_name = 'event_agent'
-  AND status = 'success'
+  AND TRIM(status) = 'success'
 ORDER BY created_at DESC 
 LIMIT 1
 ```
 
 **Features:**
 - Filters by `agent_name='event_agent'` to get only event agent records
-- Filters by `status='success'` to ensure only successful records with data are retrieved
+- Filters by `TRIM(status)='success'` to ensure only successful records with data are retrieved
+  - TRIM handles status values with trailing newlines (e.g., `'success\n'`)
 - Orders by `created_at DESC` to get the most recent successful record
 - Limits to 1 record for optimal performance
 - Parses the `agent_response` JSON column
 - Returns a flat array of events with name, date, and location fields
 
-**Why the status filter is important:**
-The database may contain failed records with empty event arrays. By filtering for `status='success'`, we ensure the application always displays actual event data from successful agent runs.
+**Why TRIM is important:**
+The database may store status values with trailing newlines (e.g., `'success\n'` or `'fail-nodata\n'`). Using TRIM ensures we match both `'success'` and `'success\n'` correctly. Additionally, we filter for successful records only since failed records may contain empty event arrays.
 
 ## Setup Instructions
 
@@ -179,6 +180,7 @@ The database may contain failed records with empty event arrays. By filtering fo
 - Repositioned and styled navigation arrows with primary color
 - Implemented smart arrow display (conditional rendering based on scroll state)
 - Added hover scale effects on navigation buttons
-- **Optimized query**: Now fetches only the latest successful event_agent record (WHERE agent_name='event_agent' AND status='success' ORDER BY created_at DESC LIMIT 1)
+- **Optimized query**: Now fetches only the latest successful event_agent record (WHERE agent_name='event_agent' AND TRIM(status)='success' ORDER BY created_at DESC LIMIT 1)
 - **Fixed empty data issue**: Added status='success' filter to exclude failed records with empty event arrays
+- **Added TRIM function**: Query now handles status values with trailing newlines (e.g., 'success\n')
 - Tested end-to-end: All 15 events displaying correctly from the latest successful record
