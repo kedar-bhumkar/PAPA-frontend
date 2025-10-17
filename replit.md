@@ -57,7 +57,24 @@ The `agent_response` column contains a JSON string with the following structure:
 ```
 
 ## API Endpoints
-- `GET /api/events` - Fetches all records from `agent_output` table, parses the `agent_response` JSON column, and returns a flat array of events with name, date, and location fields
+
+### GET /api/events
+Fetches events from the latest event_agent record.
+
+**Query Logic:**
+```sql
+SELECT * FROM agent_output 
+WHERE agent_name = 'event_agent'
+ORDER BY created_at DESC 
+LIMIT 1
+```
+
+**Features:**
+- Filters by `agent_name='event_agent'` to get only event agent records
+- Orders by `created_at DESC` to get the most recent record
+- Limits to 1 record for optimal performance
+- Parses the `agent_response` JSON column
+- Returns a flat array of events with name, date, and location fields
 
 ## Setup Instructions
 
@@ -75,6 +92,7 @@ The `agent_response` column contains a JSON string with the following structure:
 ### Current Configuration
 - Successfully connected to Supabase database at `db.bbjluxtoxkopblpisdqw.supabase.co`
 - Using postgres-js driver with SSL configured
+- Fetches only the latest record from event_agent
 - Parsing events from `agent_output` table's `agent_response` JSON column
 
 ## Design System
@@ -117,6 +135,7 @@ The `agent_response` column contains a JSON string with the following structure:
 
 ## Features
 ✅ Real-time data fetching from Supabase
+✅ Optimized query (latest event_agent record only)
 ✅ JSON parsing from agent_response column
 ✅ Event display with date, location, and name
 ✅ Stunning gradient title with large typography
@@ -146,4 +165,5 @@ The `agent_response` column contains a JSON string with the following structure:
 - Repositioned and styled navigation arrows with primary color
 - Implemented smart arrow display (conditional rendering based on scroll state)
 - Added hover scale effects on navigation buttons
-- Tested end-to-end: All 10 events displaying correctly with complete information
+- **Optimized query**: Now fetches only the latest event_agent record (WHERE agent_name='event_agent' ORDER BY created_at DESC LIMIT 1)
+- Tested end-to-end: All 10 events displaying correctly from the latest record

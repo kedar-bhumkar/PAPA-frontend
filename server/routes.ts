@@ -2,25 +2,30 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { db } from "./db";
 import { agentData, eventsResponseSchema, type EventData } from "@shared/schema";
+import { eq, desc } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Get all events from agent_response JSON
+  // Get events from the latest event_agent record
   app.get("/api/events", async (req, res) => {
     try {
-      const agentRecords = await db.select().from(agentData);
+      // Select the latest record where agent_name='event_agent', LIMIT 1
+      const latestRecord = await db
+        .select()
+        .from(agentData)
+        .where(eq(agentData.agentName, 'event_agent'))
+        .orderBy(desc(agentData.createdAt))
+        .limit(1);
       
       let allEvents: EventData[] = [];
       
-      // Parse agent_response JSON from each record
-      for (const record of agentRecords) {
-        if (record.agentResponse) {
-          try {
-            const parsed = JSON.parse(record.agentResponse);
-            const validated = eventsResponseSchema.parse(parsed);
-            allEvents = allEvents.concat(validated.events);
-          } catch (parseError) {
-            console.error("Error parsing agent_response:", parseError);
-          }
+      // Parse agent_response JSON from the latest record
+      if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        try {
+          const parsed = JSON.parse(latestRecord[0].agentResponse);
+          const validated = eventsResponseSchema.parse(parsed);
+          allEvents = validated.events;
+        } catch (parseError) {
+          console.error("Error parsing agent_response:", parseError);
         }
       }
       
