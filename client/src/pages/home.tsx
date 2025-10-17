@@ -29,9 +29,13 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex items-center justify-between px-6 py-4">
+        <div className="container mx-auto flex items-center justify-between px-6 py-6">
           <div>
-            <h1 className="text-2xl font-bold text-foreground" data-testid="text-app-title">
+            <h1 
+              className="text-5xl font-black tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent" 
+              style={{ fontFamily: 'Manrope, sans-serif' }}
+              data-testid="text-app-title"
+            >
               PAPA
             </h1>
           </div>
