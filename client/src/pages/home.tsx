@@ -3,11 +3,11 @@ import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
-import { type Event } from "@shared/schema";
+import { type EventData } from "@shared/schema";
 import eventBg1 from '@assets/generated_images/Event_card_gradient_background_8c68dd6e.png';
 
 export default function Home() {
-  const { data: events, isLoading } = useQuery<Event[]>({
+  const { data: events, isLoading } = useQuery<EventData[]>({
     queryKey: ['/api/events'],
   });
 
@@ -19,8 +19,8 @@ export default function Home() {
       categoryColor: "bg-primary/20",
       items: events.map(event => ({
         date: event.date,
-        place: event.place,
-        event: event.event,
+        location: event.location,
+        name: event.name,
       })),
     },
   ] : [];

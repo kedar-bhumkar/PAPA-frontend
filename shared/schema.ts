@@ -19,7 +19,7 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // Supabase agent data table
-export const agentData = pgTable("search_agent", {
+export const agentData = pgTable("agent_output", {
   id: text("id").primaryKey(),
   createdAt: timestamp("created_at").defaultNow(),
   agentName: text("agent_name"),

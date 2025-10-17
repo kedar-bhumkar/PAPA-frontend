@@ -1,7 +1,7 @@
 # PAPA - Events Showcase Application
 
 ## Overview
-A visually stunning React application that displays events from a Supabase database in a beautiful horizontal scrolling carousel. The app features smooth animations, dark/light theme support, and a clean, modern design.
+A visually stunning React application that displays events from a Supabase database in a beautiful carousel interface. The app features smooth animations, dark/light theme support, and a clean, modern design.
 
 ## Project Architecture
 
@@ -20,15 +20,15 @@ A visually stunning React application that displays events from a Supabase datab
 
 ### Key Components
 - `ConceptBox`: Displays event data in a card format with date, location, and event name
-- `ConceptCarousel`: Horizontal scrollable container with navigation arrows
+- `ConceptCarousel`: Scrollable container with navigation arrows
 - `ThemeToggle`: Dark/light mode switcher
 - `LoadingSkeleton`: Loading state with shimmer animation
 
 ## Database Schema
 
-### Supabase Table: `search_agent`
+### Supabase Table: `agent_output`
 ```sql
-CREATE TABLE search_agent (
+CREATE TABLE agent_output (
   id TEXT PRIMARY KEY,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   agent_name TEXT,
@@ -38,6 +38,7 @@ CREATE TABLE search_agent (
 ```
 
 ### JSON Structure in `agent_response` Column
+The `agent_response` column contains a JSON string with the following structure:
 ```json
 {
   "events": [
@@ -56,31 +57,25 @@ CREATE TABLE search_agent (
 ```
 
 ## API Endpoints
-- `GET /api/events` - Fetches all records from `search_agent` table, parses the `agent_response` JSON, and returns array of events
+- `GET /api/events` - Fetches all records from `agent_output` table, parses the `agent_response` JSON column, and returns a flat array of events with name, date, and location fields
 
 ## Setup Instructions
 
 ### Database Connection
 1. The application connects to Supabase using the `DATABASE_URL` environment variable
-2. Get your connection string from Supabase dashboard:
-   - Navigate to your project
-   - Click "Connect" button
-   - Copy URI from "Connection string" → "Transaction pooler"
-   - Replace `[YOUR-PASSWORD]` with your actual database password
-3. The connection string format should be:
+2. Connection string format:
    ```
-   postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+   postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
    ```
+3. Get your connection string from Supabase dashboard:
+   - Navigate to your project settings
+   - Go to Database settings
+   - Use the direct connection string (not pooler for this setup)
 
-### Troubleshooting Connection Issues
-If you see `ECONNRESET` or TLS connection errors:
-1. Verify your DATABASE_URL is correct and the password is properly replaced
-2. Ensure your Supabase project is active and accessible
-3. Check that the connection string is from the "Transaction pooler" section
-4. Verify network/firewall settings allow connections to Supabase
-
-### Sample Data
-The application automatically parses events from the `agent_response` JSON column. No manual data insertion is needed if your Supabase table already contains records with event data.
+### Current Configuration
+- Successfully connected to Supabase database
+- Using postgres-js driver with SSL configured
+- Parsing events from `agent_output` table's `agent_response` JSON column
 
 ## Design System
 
@@ -96,14 +91,14 @@ The application automatically parses events from the `agent_response` JSON colum
 
 ### Animations
 - Slide-in animations for cards (staggered delays)
-- Smooth scroll behavior with snap points
+- Smooth scroll behavior
 - Hover elevations on interactive elements
 - Shimmer loading animation
 
 ## Features
 ✅ Real-time data fetching from Supabase
 ✅ JSON parsing from agent_response column
-✅ Horizontal scrolling carousel with navigation arrows
+✅ Event display with date, location, and name
 ✅ Dark/light theme toggle
 ✅ Responsive design
 ✅ Loading states with skeleton UI
@@ -119,9 +114,9 @@ The application automatically parses events from the `agent_response` JSON colum
 - Focus on Events data only (no appointments or financial info)
 
 ## Recent Changes
-- **2025-10-17**: Updated to parse events from Supabase search_agent table
-- Modified schema to match actual Supabase table structure (agent_response JSON column)
-- Switched from Neon driver to postgres-js for better Supabase compatibility
-- Implemented JSON parsing to extract events array from agent_response
-- Updated frontend to display: name, date, and location fields
-- Configured SSL settings for Supabase transaction pooler connection
+- **2025-10-17**: Successfully connected to Supabase
+- Fixed table name from `search_agent` to `agent_output`
+- Updated schema to parse events with name, date, location fields
+- Configured postgres-js driver with proper SSL settings
+- Fixed frontend to correctly display all event fields
+- Tested end-to-end: All 10 events displaying correctly with complete information
