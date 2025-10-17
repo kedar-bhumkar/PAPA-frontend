@@ -1,39 +1,29 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
+import { type Event } from "@shared/schema";
 import eventBg1 from '@assets/generated_images/Event_card_gradient_background_8c68dd6e.png';
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [concepts, setConcepts] = useState<ConceptBoxProps[]>([]);
+  const { data: events, isLoading } = useQuery<Event[]>({
+    queryKey: ['/api/events'],
+  });
 
-  useEffect(() => {
-    // TODO: remove mock functionality - Replace with actual Supabase data fetching
-    const mockConcepts: ConceptBoxProps[] = [
-      {
-        title: "Today's Picks",
-        category: "Events",
-        imageUrl: eventBg1,
-        categoryColor: "bg-primary/20",
-        items: [
-          { date: 'June 15, 2025', place: 'Central Park, NYC', event: 'Summer Music Festival' },
-          { date: 'June 22, 2025', place: 'Blue Note, Manhattan', event: 'Jazz Night Live' },
-          { date: 'July 10, 2025', place: 'Convention Center, SF', event: 'Tech Summit 2025' },
-          { date: 'July 18, 2025', place: 'MoMA, New York', event: 'Art Gallery Opening' },
-          { date: 'August 5, 2025', place: 'Napa Valley, CA', event: 'Food & Wine Festival' },
-          { date: 'August 12, 2025', place: 'Comedy Club, LA', event: 'Comedy Night Live' },
-        ],
-      },
-    ];
-
-    // Simulate loading
-    setTimeout(() => {
-      setConcepts(mockConcepts);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+  const concepts: ConceptBoxProps[] = events ? [
+    {
+      title: "Today's Picks",
+      category: "Events",
+      imageUrl: eventBg1,
+      categoryColor: "bg-primary/20",
+      items: events.map(event => ({
+        date: event.date,
+        place: event.place,
+        event: event.event,
+      })),
+    },
+  ] : [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -51,11 +41,19 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container mx-auto py-12">
-
         {isLoading ? (
           <LoadingSkeleton />
-        ) : (
+        ) : events && events.length > 0 ? (
           <ConceptCarousel concepts={concepts} />
+        ) : (
+          <div className="flex min-h-[400px] items-center justify-center px-8">
+            <div className="text-center">
+              <h2 className="mb-2 text-2xl font-bold text-foreground">No Events Yet</h2>
+              <p className="text-muted-foreground">
+                Events will appear here when they are added to your Supabase database.
+              </p>
+            </div>
+          </div>
         )}
       </main>
 
