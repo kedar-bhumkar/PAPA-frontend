@@ -42,11 +42,8 @@ export default function Home() {
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground" data-testid="text-app-title">
-              Events Showcase
+              PAPA
             </h1>
-            <p className="text-sm text-muted-foreground" data-testid="text-app-subtitle">
-              Discover amazing events near you
-            </p>
           </div>
           <ThemeToggle />
         </div>
@@ -54,14 +51,6 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container mx-auto py-12">
-        <div className="mb-8 px-8">
-          <h2 className="mb-2 text-3xl font-bold text-foreground" data-testid="text-section-title">
-            Your Events
-          </h2>
-          <p className="text-muted-foreground" data-testid="text-section-description">
-            Browse upcoming events at a glance
-          </p>
-        </div>
 
         {isLoading ? (
           <LoadingSkeleton />
