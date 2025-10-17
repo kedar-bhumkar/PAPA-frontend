@@ -16,55 +16,71 @@ A visually stunning React application that displays events from a Supabase datab
 ### Backend (Express + TypeScript)
 - **Server**: Express.js
 - **Database**: Supabase (PostgreSQL)
-- **ORM**: Drizzle ORM with Neon HTTP adapter
+- **ORM**: Drizzle ORM with postgres-js driver
 
 ### Key Components
-- `ConceptBox`: Displays event data in a card format with date, place, and event name
+- `ConceptBox`: Displays event data in a card format with date, location, and event name
 - `ConceptCarousel`: Horizontal scrollable container with navigation arrows
 - `ThemeToggle`: Dark/light mode switcher
 - `LoadingSkeleton`: Loading state with shimmer animation
 
 ## Database Schema
 
-### Events Table
+### Supabase Table: `search_agent`
 ```sql
-CREATE TABLE events (
-  id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-  date TEXT NOT NULL,
-  place TEXT NOT NULL,
-  event TEXT NOT NULL,
-  category TEXT DEFAULT 'Events',
-  image_url TEXT,
-  created_at TIMESTAMP DEFAULT NOW()
+CREATE TABLE search_agent (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  agent_name TEXT,
+  agent_response TEXT,  -- JSON string containing events data
+  status TEXT
 );
 ```
 
+### JSON Structure in `agent_response` Column
+```json
+{
+  "events": [
+    {
+      "name": "Paul McCartney — Got Back Tour",
+      "date": "2025-10-17",
+      "location": "U.S. Bank Stadium, Minneapolis"
+    },
+    {
+      "name": "Minnesota Orchestra — Beethoven's Fifth",
+      "date": "2025-10-18",
+      "location": "Orchestra Hall, Minneapolis"
+    }
+  ]
+}
+```
+
 ## API Endpoints
-- `GET /api/events` - Fetches all events from Supabase
+- `GET /api/events` - Fetches all records from `search_agent` table, parses the `agent_response` JSON, and returns array of events
 
 ## Setup Instructions
 
-### Database Setup
-1. The application uses Supabase for data storage
-2. Ensure your DATABASE_URL environment variable is set with the Supabase connection string
-3. Connection string format: `postgresql://[user]:[password]@[host]/[database]?sslmode=require`
-4. Get the connection string from Supabase dashboard:
+### Database Connection
+1. The application connects to Supabase using the `DATABASE_URL` environment variable
+2. Get your connection string from Supabase dashboard:
    - Navigate to your project
    - Click "Connect" button
-   - Copy URI from "Transaction pooler" section
-   - Replace `[YOUR-PASSWORD]` with your database password
+   - Copy URI from "Connection string" → "Transaction pooler"
+   - Replace `[YOUR-PASSWORD]` with your actual database password
+3. The connection string format should be:
+   ```
+   postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+   ```
 
-### Adding Events to Supabase
-To populate the events table, you can use the Supabase SQL Editor:
+### Troubleshooting Connection Issues
+If you see `ECONNRESET` or TLS connection errors:
+1. Verify your DATABASE_URL is correct and the password is properly replaced
+2. Ensure your Supabase project is active and accessible
+3. Check that the connection string is from the "Transaction pooler" section
+4. Verify network/firewall settings allow connections to Supabase
 
-```sql
-INSERT INTO events (date, place, event) VALUES
-  ('June 15, 2025', 'Central Park, NYC', 'Summer Music Festival'),
-  ('June 22, 2025', 'Blue Note, Manhattan', 'Jazz Night Live'),
-  ('July 10, 2025', 'Convention Center, SF', 'Tech Summit 2025'),
-  ('July 18, 2025', 'MoMA, New York', 'Art Gallery Opening'),
-  ('August 5, 2025', 'Napa Valley, CA', 'Food & Wine Festival');
-```
+### Sample Data
+The application automatically parses events from the `agent_response` JSON column. No manual data insertion is needed if your Supabase table already contains records with event data.
 
 ## Design System
 
@@ -86,6 +102,7 @@ INSERT INTO events (date, place, event) VALUES
 
 ## Features
 ✅ Real-time data fetching from Supabase
+✅ JSON parsing from agent_response column
 ✅ Horizontal scrolling carousel with navigation arrows
 ✅ Dark/light theme toggle
 ✅ Responsive design
@@ -97,13 +114,14 @@ INSERT INTO events (date, place, event) VALUES
 ## User Preferences
 - Keep the fonts (Inter and Manrope)
 - Keep background effects and animations
-- Header title should display "PAPA"
-- Events displayed in grouped format: date, place, event name
+- Header title displays "PAPA"
+- Events displayed in grouped format: date, location, event name
 - Focus on Events data only (no appointments or financial info)
 
 ## Recent Changes
-- **2025-10-17**: Initial setup with Supabase integration
-- Created event schema and API endpoints
-- Built reusable UI components with examples
-- Implemented horizontal carousel with smooth scrolling
-- Added theme toggle and responsive design
+- **2025-10-17**: Updated to parse events from Supabase search_agent table
+- Modified schema to match actual Supabase table structure (agent_response JSON column)
+- Switched from Neon driver to postgres-js for better Supabase compatibility
+- Implemented JSON parsing to extract events array from agent_response
+- Updated frontend to display: name, date, and location fields
+- Configured SSL settings for Supabase transaction pooler connection

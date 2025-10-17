@@ -18,21 +18,27 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-// Events table for Supabase
-export const events = pgTable("events", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  date: text("date").notNull(),
-  place: text("place").notNull(),
-  event: text("event").notNull(),
-  category: text("category").default("Events"),
-  imageUrl: text("image_url"),
+// Supabase agent data table
+export const agentData = pgTable("search_agent", {
+  id: text("id").primaryKey(),
   createdAt: timestamp("created_at").defaultNow(),
+  agentName: text("agent_name"),
+  agentResponse: text("agent_response"),
+  status: text("status"),
 });
 
-export const insertEventSchema = createInsertSchema(events).omit({
-  id: true,
-  createdAt: true,
+export type AgentData = typeof agentData.$inferSelect;
+
+// Event data structure (parsed from JSON)
+export const eventSchema = z.object({
+  name: z.string(),
+  date: z.string(),
+  location: z.string(),
 });
 
-export type InsertEvent = z.infer<typeof insertEventSchema>;
-export type Event = typeof events.$inferSelect;
+export const eventsResponseSchema = z.object({
+  events: z.array(eventSchema),
+});
+
+export type EventData = z.infer<typeof eventSchema>;
+export type EventsResponse = z.infer<typeof eventsResponseSchema>;

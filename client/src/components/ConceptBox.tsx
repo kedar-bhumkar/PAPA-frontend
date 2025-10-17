@@ -3,8 +3,8 @@ import { Badge } from "@/components/ui/badge";
 
 export interface ConceptItem {
   date: string;
-  place: string;
-  event: string;
+  location: string;
+  name: string;
 }
 
 export interface ConceptBoxProps {
@@ -72,10 +72,10 @@ export default function ConceptBox({
                 <span>{item.date}</span>
               </div>
               <div className="text-sm text-muted-foreground">
-                {item.place}
+                {item.location}
               </div>
               <div className="text-base font-medium text-card-foreground">
-                {item.event}
+                {item.name}
               </div>
             </div>
           ))}
