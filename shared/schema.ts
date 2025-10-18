@@ -43,3 +43,13 @@ export const eventsResponseSchema = z.object({
 
 export type EventData = z.infer<typeof eventSchema>;
 export type EventsResponse = z.infer<typeof eventsResponseSchema>;
+
+// Calendar event data structure (parsed from JSON array)
+export const calendarEventSchema = z.object({
+  summary: z.string(),
+  startTime: z.string(),
+  link: z.string(),
+  id: z.string(),
+});
+
+export type CalendarEventData = z.infer<typeof calendarEventSchema>;

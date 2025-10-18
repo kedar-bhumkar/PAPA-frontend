@@ -1,12 +1,24 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
-export interface ConceptItem {
+export type ConceptItem = EventItem | CalendarItem;
+
+export interface EventItem {
+  type: "event";
   date: string;
   location: string;
   name: string;
   url?: string;
+}
+
+export interface CalendarItem {
+  type: "calendar";
+  summary: string;
+  startTime: string;
+  link?: string;
 }
 
 export interface ConceptBoxProps {
@@ -15,6 +27,17 @@ export interface ConceptBoxProps {
   items: ConceptItem[];
   imageUrl?: string;
   categoryColor?: string;
+}
+
+// Helper function to format calendar date/time in CST
+function formatCalendarTime(isoString: string): string {
+  try {
+    const date = new Date(isoString);
+    const cstDate = toZonedTime(date, "America/Chicago");
+    return format(cstDate, "MMM d, yyyy • h:mm a 'CST'");
+  } catch {
+    return isoString;
+  }
 }
 
 export default function ConceptBox({
@@ -70,29 +93,56 @@ export default function ConceptBox({
               className="relative space-y-1 rounded-md bg-card/30 p-3 backdrop-blur-sm"
               data-testid={`item-${index}`}
             >
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
-                <span>{item.date}</span>
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {item.location}
-              </div>
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 text-base font-medium text-card-foreground">
-                  {item.name}
-                </div>
-                {item.url && (
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
-                    data-testid={`link-event-${index}`}
-                    aria-label="Visit event website"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                )}
-              </div>
+              {item.type === "event" ? (
+                <>
+                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
+                    <span>{item.date}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {item.location}
+                  </div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 text-base font-medium text-card-foreground">
+                      {item.name}
+                    </div>
+                    {item.url && (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
+                        data-testid={`link-event-${index}`}
+                        aria-label="Visit event website"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
+                    <span>{formatCalendarTime(item.startTime)}</span>
+                  </div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 text-base font-medium text-card-foreground">
+                      {item.summary}
+                    </div>
+                    {item.link && (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
+                        data-testid={`link-calendar-${index}`}
+                        aria-label="Visit calendar event"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>
