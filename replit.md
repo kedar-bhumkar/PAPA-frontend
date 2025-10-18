@@ -19,10 +19,11 @@ A visually stunning React application that displays events from a Supabase datab
 - **ORM**: Drizzle ORM with postgres-js driver
 
 ### Key Components
-- `ConceptBox`: Displays event data in a card format with date, location, and event name
+- `ConceptBox`: Displays event data in a card format with date, location, event name, and optional URL link
 - `ConceptCarousel`: Horizontal scrollable container with smart navigation arrows
 - `ThemeToggle`: Dark/light mode switcher
 - `LoadingSkeleton`: Loading state with shimmer animation
+- `ExternalLink Icon`: Clickable site icon displayed on the right side of event cards when URL is available
 
 ## Database Schema
 
@@ -45,12 +46,14 @@ The `agent_response` column contains a JSON string with the following structure:
     {
       "name": "Paul McCartney — Got Back Tour",
       "date": "2025-10-17",
-      "location": "U.S. Bank Stadium, Minneapolis"
+      "location": "U.S. Bank Stadium, Minneapolis",
+      "url": "https://example.com/event-link" (optional)
     },
     {
       "name": "Minnesota Orchestra — Beethoven's Fifth",
       "date": "2025-10-18",
-      "location": "Orchestra Hall, Minneapolis"
+      "location": "Orchestra Hall, Minneapolis",
+      "url": "https://example.com/another-event" (optional)
     }
   ]
 }
@@ -151,7 +154,8 @@ The database may store status values with trailing newlines (e.g., `'success\n'`
 ✅ Real-time data fetching from Supabase
 ✅ Optimized query (latest event_agent record only)
 ✅ JSON parsing from agent_response column
-✅ Event display with date, location, and name
+✅ Event display with date, location, name, and optional URL
+✅ Clickable external link icons for events with URLs (opens in new tab)
 ✅ Stunning gradient title with large typography
 ✅ Smart navigation arrows (show/hide based on scroll state)
 ✅ Dark/light theme toggle
@@ -183,4 +187,8 @@ The database may store status values with trailing newlines (e.g., `'success\n'`
 - **Optimized query**: Now fetches only the latest successful event_agent record (WHERE agent_name='event_agent' AND TRIM(status)='success' ORDER BY created_at DESC LIMIT 1)
 - **Fixed empty data issue**: Added status='success' filter to exclude failed records with empty event arrays
 - **Added TRIM function**: Query now handles status values with trailing newlines (e.g., 'success\n')
+- **Added URL support**: Events now include optional 'url' field in JSON, displayed as clickable ExternalLink icons
+  - Icon appears on the right side of event cards in primary color
+  - Opens in new browser tab with security attributes (target="_blank" rel="noopener noreferrer")
+  - Only displays when URL is present in event data
 - Tested end-to-end: All 15 events displaying correctly from the latest successful record

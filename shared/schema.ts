@@ -34,6 +34,7 @@ export const eventSchema = z.object({
   name: z.string(),
   date: z.string(),
   location: z.string(),
+  url: z.string().optional(),
 });
 
 export const eventsResponseSchema = z.object({

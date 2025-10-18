@@ -21,6 +21,7 @@ export default function Home() {
         date: event.date,
         location: event.location,
         name: event.name,
+        url: event.url,
       })),
     },
   ] : [];

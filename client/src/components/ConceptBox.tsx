@@ -1,10 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ExternalLink } from "lucide-react";
 
 export interface ConceptItem {
   date: string;
   location: string;
   name: string;
+  url?: string;
 }
 
 export interface ConceptBoxProps {
@@ -65,7 +67,7 @@ export default function ConceptBox({
           {items.map((item, index) => (
             <div
               key={index}
-              className="space-y-1 rounded-md bg-card/30 p-3 backdrop-blur-sm"
+              className="relative space-y-1 rounded-md bg-card/30 p-3 backdrop-blur-sm"
               data-testid={`item-${index}`}
             >
               <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
@@ -74,8 +76,22 @@ export default function ConceptBox({
               <div className="text-sm text-muted-foreground">
                 {item.location}
               </div>
-              <div className="text-base font-medium text-card-foreground">
-                {item.name}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 text-base font-medium text-card-foreground">
+                  {item.name}
+                </div>
+                {item.url && (
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
+                    data-testid={`link-event-${index}`}
+                    aria-label="Visit event website"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                )}
               </div>
             </div>
           ))}
