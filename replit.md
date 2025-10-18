@@ -1,7 +1,7 @@
-# PAPA - Events Showcase Application
+# PAPA - Events & Calendar Showcase Application
 
 ## Overview
-A visually stunning React application that displays events from a Supabase database in a beautiful carousel interface. The app features smooth animations, dark/light theme support, and a clean, modern design with an eye-catching gradient title.
+A visually stunning React application that displays both events and calendar items from a Supabase database in a beautiful carousel interface. The app features smooth animations, dark/light theme support, and a clean, modern design with an eye-catching gradient title. Users can view upcoming events and calendar appointments with formatted CST times and clickable links.
 
 ## Project Architecture
 
@@ -19,11 +19,13 @@ A visually stunning React application that displays events from a Supabase datab
 - **ORM**: Drizzle ORM with postgres-js driver
 
 ### Key Components
-- `ConceptBox`: Displays event data in a card format with date, location, event name, and optional URL link
+- `ConceptBox`: Displays both event and calendar data in card format with type discrimination
+  - **Event items**: Show date, location, event name, and optional URL link
+  - **Calendar items**: Show formatted CST date/time, summary, and optional link
 - `ConceptCarousel`: Horizontal scrollable container with smart navigation arrows
 - `ThemeToggle`: Dark/light mode switcher
 - `LoadingSkeleton`: Loading state with shimmer animation
-- `ExternalLink Icon`: Clickable site icon displayed on the right side of event cards when URL is available
+- `ExternalLink Icon`: Clickable site icon displayed on the right side when URL/link is available
 
 ## Database Schema
 
@@ -39,7 +41,8 @@ CREATE TABLE agent_output (
 ```
 
 ### JSON Structure in `agent_response` Column
-The `agent_response` column contains a JSON string with the following structure:
+
+#### For `event_agent` (wrapped in events object):
 ```json
 {
   "events": [
@@ -57,6 +60,18 @@ The `agent_response` column contains a JSON string with the following structure:
     }
   ]
 }
+```
+
+#### For `calendar_agent` (direct array):
+```json
+[
+  {
+    "summary": "Gas number",
+    "startTime": "2025-10-25T01:30:00-05:00",
+    "link": "https://www.google.com/calendar/event?eid=...",
+    "id": "l4rumat2u3o77b45ga4qpqj2ck_20251025T063000Z"
+  }
+]
 ```
 
 ## API Endpoints
@@ -85,6 +100,33 @@ LIMIT 1
 **Why TRIM is important:**
 The database may store status values with trailing newlines (e.g., `'success\n'` or `'fail-nodata\n'`). Using TRIM ensures we match both `'success'` and `'success\n'` correctly. Additionally, we filter for successful records only since failed records may contain empty event arrays.
 
+### GET /api/calendar
+Fetches calendar events from the latest calendar_agent record.
+
+**Query Logic:**
+```sql
+SELECT * FROM agent_output 
+WHERE agent_name = 'calendar_agent'
+  AND TRIM(status) = 'success'
+ORDER BY created_at DESC 
+LIMIT 1
+```
+
+**Features:**
+- Filters by `agent_name='calendar_agent'` to get only calendar agent records
+- Uses same TRIM logic as events endpoint for status handling
+- Orders by `created_at DESC` to get the most recent successful record
+- Limits to 1 record for optimal performance
+- Parses the `agent_response` JSON column (direct array format)
+- Returns array of calendar events with summary, startTime, link, and id fields
+- Handles both string and pre-parsed JSON objects for compatibility
+
+**Calendar Event Format:**
+- **summary**: Event title/description
+- **startTime**: ISO-8601 datetime string (formatted to CST on frontend)
+- **link**: Google Calendar event URL (optional)
+- **id**: Unique event identifier
+
 ## Setup Instructions
 
 ### Database Connection
@@ -101,8 +143,9 @@ The database may store status values with trailing newlines (e.g., `'success\n'`
 ### Current Configuration
 - Successfully connected to Supabase database at `db.bbjluxtoxkopblpisdqw.supabase.co`
 - Using postgres-js driver with SSL configured
-- Fetches only the latest record from event_agent
-- Parsing events from `agent_output` table's `agent_response` JSON column
+- Fetches latest records from both `event_agent` and `calendar_agent`
+- Parsing events and calendar items from `agent_output` table's `agent_response` JSON column
+- Calendar times automatically converted to CST timezone for display
 
 ## Design System
 
@@ -151,11 +194,14 @@ The database may store status values with trailing newlines (e.g., `'success\n'`
 - Shimmer loading animation
 
 ## Features
-✅ Real-time data fetching from Supabase
-✅ Optimized query (latest event_agent record only)
-✅ JSON parsing from agent_response column
-✅ Event display with date, location, name, and optional URL
-✅ Clickable external link icons for events with URLs (opens in new tab)
+✅ Real-time data fetching from Supabase for both events and calendar items
+✅ Optimized queries (latest successful record for each agent type)
+✅ JSON parsing from agent_response column with error handling
+✅ **Event display**: date, location, name, and optional URL
+✅ **Calendar display**: formatted CST date/time and summary
+✅ Clickable external link icons (opens in new tab)
+✅ Automatic CST timezone conversion for calendar times
+✅ Type-safe discriminated unions for event vs calendar items
 ✅ Stunning gradient title with large typography
 ✅ Smart navigation arrows (show/hide based on scroll state)
 ✅ Dark/light theme toggle
@@ -170,7 +216,7 @@ The database may store status values with trailing newlines (e.g., `'success\n'`
 - Keep background effects and animations
 - Header title displays "PAPA" with gradient effect
 - Events displayed in grouped format: date, location, event name
-- Focus on Events data only (no appointments or financial info)
+- Calendar items displayed with formatted CST time and summary
 - Navigation arrows positioned correctly and styled prominently
 
 ## Recent Changes
@@ -192,3 +238,11 @@ The database may store status values with trailing newlines (e.g., `'success\n'`
   - Opens in new browser tab with security attributes (target="_blank" rel="noopener noreferrer")
   - Only displays when URL is present in event data
 - Tested end-to-end: All 15 events displaying correctly from the latest successful record
+- **2025-10-18**: Added Calendar card feature
+  - New `/api/calendar` endpoint fetches latest calendar_agent record
+  - Calendar events display formatted CST date/time using date-fns-tz
+  - ConceptBox component updated with discriminated union types for event vs calendar items
+  - Both Events and Calendar cards displayed side-by-side in carousel
+  - Calendar items show summary and clickable Google Calendar links
+  - Handles both string and pre-parsed JSON formats for agent_response
+  - Tested with real calendar data showing "Gas number" event
