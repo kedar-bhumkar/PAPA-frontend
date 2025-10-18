@@ -5,6 +5,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
 import { type EventData, type CalendarEventData } from "@shared/schema";
 import eventBg1 from "@assets/generated_images/Event_card_gradient_background_8c68dd6e.png";
+import calendarBg from "@assets/generated_images/Calendar_card_gradient_background_f49550e0.png";
 
 export default function Home() {
   const { data: events, isLoading: eventsLoading } = useQuery<EventData[]>({
@@ -41,8 +42,8 @@ export default function Home() {
     concepts.push({
       title: "Upcoming",
       category: "Calendar",
-      imageUrl: eventBg1,
-      categoryColor: "bg-accent/20",
+      imageUrl: calendarBg,
+      categoryColor: "bg-cyan-500/20",
       items: calendarEvents.map((calEvent) => ({
         type: "calendar" as const,
         summary: calEvent.summary,

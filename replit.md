@@ -20,8 +20,8 @@ A visually stunning React application that displays both events and calendar ite
 
 ### Key Components
 - `ConceptBox`: Displays both event and calendar data in card format with type discrimination
-  - **Event items**: Show date, location, event name, and optional URL link
-  - **Calendar items**: Show formatted CST date/time, summary, and optional link
+  - **Event items**: Show date, location, event name, and optional URL link (purple/pink gradient background)
+  - **Calendar items**: Show formatted CST date/time, summary, and optional link (blue/teal gradient background)
 - `ConceptCarousel`: Horizontal scrollable container with smart navigation arrows
 - `ThemeToggle`: Dark/light mode switcher
 - `LoadingSkeleton`: Loading state with shimmer animation
@@ -178,6 +178,8 @@ LIMIT 1
 
 ### Colors
 - **Primary**: Purple-blue (250° hue) for accents and interactive elements
+- **Events Card**: Purple-pink gradient background with primary color accents
+- **Calendar Card**: Blue-teal-cyan gradient background with cyan color accents
 - **Dark Mode**: Deep charcoal backgrounds with elevated card surfaces
 - **Light Mode**: Clean white/gray backgrounds
 
@@ -245,4 +247,5 @@ LIMIT 1
   - Both Events and Calendar cards displayed side-by-side in carousel
   - Calendar items show summary and clickable Google Calendar links
   - Handles both string and pre-parsed JSON formats for agent_response
+  - Calendar card uses unique blue/teal/cyan gradient background to distinguish from Events card
   - Tested with real calendar data showing "Gas number" event
