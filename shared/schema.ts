@@ -67,3 +67,21 @@ export const expenseDataSchema = z.object({
 });
 
 export type ExpenseData = z.infer<typeof expenseDataSchema>;
+
+// Expense detail line item
+export const expenseDetailSchema = z.object({
+  label: z.string(),
+  amount: z.number(),
+});
+
+export type ExpenseDetail = z.infer<typeof expenseDetailSchema>;
+
+// Normalized expense item with optional details for expansion
+export const expenseItemSchema = z.object({
+  category: z.string(),
+  amount: z.number(),
+  icon: z.enum(["salary", "expenses", "subscriptions", "investments", "savings"]),
+  details: z.array(expenseDetailSchema).optional(),
+});
+
+export type ExpenseItem = z.infer<typeof expenseItemSchema>;
