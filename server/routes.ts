@@ -5,8 +5,10 @@ import {
   agentData,
   eventsResponseSchema,
   calendarEventSchema,
+  expenseDataSchema,
   type EventData,
   type CalendarEventData,
+  type ExpenseData,
 } from "@shared/schema";
 import { and, eq, desc, sql } from "drizzle-orm";
 
@@ -90,6 +92,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching calendar events:", error);
       res.status(500).json({ error: "Failed to fetch calendar events" });
+    }
+  });
+
+  // Get expense data from the latest successful expense_agent record
+  app.get("/api/expenses", async (req, res) => {
+    try {
+      // Select the latest successful record where agent_name='expense_agent', LIMIT 1
+      // Using TRIM to handle potential newline at the end of status
+      const latestRecord = await db
+        .select()
+        .from(agentData)
+        .where(
+          and(
+            eq(agentData.agentName, "expense_agent"),
+            sql`TRIM(${agentData.status}) = 'success'`
+          )
+        )
+        .orderBy(desc(agentData.createdAt))
+        .limit(1);
+
+      let expenseData: ExpenseData | null = null;
+
+      // Parse agent_response JSON from the latest record
+      if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        try {
+          // Handle case where agentResponse might already be parsed or is a string
+          const response = latestRecord[0].agentResponse;
+          const parsed = typeof response === 'string' ? JSON.parse(response) : response;
+          
+          // Validate against schema
+          expenseData = expenseDataSchema.parse(parsed);
+        } catch (parseError) {
+          console.error("Error parsing expense agent_response:", parseError);
+        }
+      }
+
+      res.json(expenseData);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+      res.status(500).json({ error: "Failed to fetch expenses" });
     }
   });
 

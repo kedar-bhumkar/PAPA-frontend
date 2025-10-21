@@ -1,7 +1,7 @@
-# PAPA - Events & Calendar Showcase Application
+# PAPA - Events, Calendar & Expenses Showcase Application
 
 ## Overview
-A visually stunning React application that displays both events and calendar items from a Supabase database in a beautiful carousel interface. The app features smooth animations, dark/light theme support, and a clean, modern design with an eye-catching gradient title. Users can view upcoming events and calendar appointments with formatted CST times and clickable links.
+A visually stunning React application that displays events, calendar items, and financial expenses from a Supabase database in a beautiful carousel interface. The app features smooth animations, dark/light theme support, and a clean, modern design with an eye-catching gradient title. Users can view upcoming events, calendar appointments with formatted CST times, and a financial overview with category-specific icons.
 
 ## Project Architecture
 
@@ -19,9 +19,10 @@ A visually stunning React application that displays both events and calendar ite
 - **ORM**: Drizzle ORM with postgres-js driver
 
 ### Key Components
-- `ConceptBox`: Displays both event and calendar data in card format with type discrimination
+- `ConceptBox`: Displays event, calendar, and expense data in card format with type discrimination
   - **Event items**: Show date, location, event name, and optional URL link (purple/pink gradient background)
   - **Calendar items**: Show formatted CST date/time, summary, and optional link (blue/teal gradient background)
+  - **Expense items**: Show category icons (DollarSign, Home, Tv, TrendingUp, PiggyBank) with amounts (amber/green gradient background)
 - `ConceptCarousel`: Horizontal scrollable container with smart navigation arrows
 - `ThemeToggle`: Dark/light mode switcher
 - `LoadingSkeleton`: Loading state with shimmer animation
@@ -72,6 +73,60 @@ CREATE TABLE agent_output (
     "id": "l4rumat2u3o77b45ga4qpqj2ck_20251025T063000Z"
   }
 ]
+```
+
+#### For `expense_agent` (nested financial data):
+```json
+{
+  "salary": 9000,
+  "expenses": {
+    "rent": 2400,
+    "internet_1": 50,
+    "heating": 100,
+    "electricity": 70,
+    "fees": 100,
+    "cub": 150,
+    "indian_store": 150,
+    "target": 400,
+    "costco": 600,
+    "vehicle_insurance": 90,
+    "home_insurance": 20,
+    "india_money": 1100,
+    "tiger": 40,
+    "vodafone": 15,
+    "internet_2": 12,
+    "total": 5442
+  },
+  "subscriptions": {
+    "adobe": 0,
+    "filmora": 0,
+    "topaz": 28,
+    "peacock": 7,
+    "kling": 26,
+    "apolo": 18,
+    "expo": 8,
+    "netflix": 22,
+    "prime": 16,
+    "fizen": 4,
+    "amc": 28,
+    "google": 3,
+    "perprai": 20,
+    "gemini": 20,
+    "claust": 25,
+    "n2n": 0,
+    "lovable": 15,
+    "total": 239
+  },
+  "investments": {
+    "adbre": 1000,
+    "vangard": 1000,
+    "total": 2000
+  },
+  "savings": {
+    "net": 3319,
+    "in_hand": 1319
+  }
+}
 ```
 
 ## API Endpoints
@@ -127,6 +182,34 @@ LIMIT 1
 - **link**: Google Calendar event URL (optional)
 - **id**: Unique event identifier
 
+### GET /api/expenses
+Fetches expense data from the latest expense_agent record.
+
+**Query Logic:**
+```sql
+SELECT * FROM agent_output 
+WHERE agent_name = 'expense_agent'
+  AND TRIM(status) = 'success'
+ORDER BY created_at DESC 
+LIMIT 1
+```
+
+**Features:**
+- Filters by `agent_name='expense_agent'` to get only expense agent records
+- Uses same TRIM logic as other endpoints for status handling
+- Orders by `created_at DESC` to get the most recent successful record
+- Limits to 1 record for optimal performance
+- Parses the `agent_response` JSON column (nested object format)
+- Returns expense object with salary, expenses, subscriptions, investments, and savings
+- Handles both string and pre-parsed JSON objects for compatibility
+
+**Expense Data Format:**
+- **salary**: Monthly salary amount (number)
+- **expenses**: Object with individual expense categories and total
+- **subscriptions**: Object with individual subscription costs and total
+- **investments**: Object with investment contributions and total
+- **savings**: Object with net savings and in-hand amounts
+
 ## Setup Instructions
 
 ### Database Connection
@@ -143,8 +226,8 @@ LIMIT 1
 ### Current Configuration
 - Successfully connected to Supabase database at `db.bbjluxtoxkopblpisdqw.supabase.co`
 - Using postgres-js driver with SSL configured
-- Fetches latest records from both `event_agent` and `calendar_agent`
-- Parsing events and calendar items from `agent_output` table's `agent_response` JSON column
+- Fetches latest records from `event_agent`, `calendar_agent`, and `expense_agent`
+- Parsing events, calendar items, and expense data from `agent_output` table's `agent_response` JSON column
 - Calendar times automatically converted to CST timezone for display
 
 ## Design System
@@ -180,6 +263,7 @@ LIMIT 1
 - **Primary**: Purple-blue (250° hue) for accents and interactive elements
 - **Events Card**: Purple-pink gradient background with primary color accents
 - **Calendar Card**: Blue-teal-cyan gradient background with cyan color accents
+- **Expenses Card**: Amber-green gradient background with amber/green color accents
 - **Dark Mode**: Deep charcoal backgrounds with elevated card surfaces
 - **Light Mode**: Clean white/gray backgrounds
 
@@ -196,14 +280,16 @@ LIMIT 1
 - Shimmer loading animation
 
 ## Features
-✅ Real-time data fetching from Supabase for both events and calendar items
+✅ Real-time data fetching from Supabase for events, calendar, and expenses
 ✅ Optimized queries (latest successful record for each agent type)
 ✅ JSON parsing from agent_response column with error handling
 ✅ **Event display**: date, location, name, and optional URL
 ✅ **Calendar display**: formatted CST date/time and summary
+✅ **Expense display**: financial overview with category icons (salary, expenses, subscriptions, investments, savings)
 ✅ Clickable external link icons (opens in new tab)
 ✅ Automatic CST timezone conversion for calendar times
-✅ Type-safe discriminated unions for event vs calendar items
+✅ Type-safe discriminated unions for event, calendar, and expense items
+✅ Category-specific icons using Lucide React (DollarSign, Home, Tv, TrendingUp, PiggyBank)
 ✅ Stunning gradient title with large typography
 ✅ Smart navigation arrows (show/hide based on scroll state)
 ✅ Dark/light theme toggle
@@ -211,7 +297,7 @@ LIMIT 1
 ✅ Loading states with skeleton UI
 ✅ Empty state messaging
 ✅ Smooth animations and transitions
-✅ Beautiful gradient backgrounds
+✅ Beautiful gradient backgrounds (unique for each card type)
 
 ## User Preferences
 - Keep the fonts (Inter and Manrope)
@@ -219,6 +305,7 @@ LIMIT 1
 - Header title displays "PAPA" with gradient effect
 - Events displayed in grouped format: date, location, event name
 - Calendar items displayed with formatted CST time and summary
+- Expenses displayed with category icons and formatted currency amounts
 - Navigation arrows positioned correctly and styled prominently
 
 ## Recent Changes
@@ -249,3 +336,12 @@ LIMIT 1
   - Handles both string and pre-parsed JSON formats for agent_response
   - Calendar card uses unique blue/teal/cyan gradient background to distinguish from Events card
   - Tested with real calendar data showing "Gas number" event
+- **2025-10-21**: Added Expenses card feature
+  - New `/api/expenses` endpoint fetches latest expense_agent record
+  - Displays financial overview with five categories: Salary, Expenses, Subscriptions, Investments, Net Savings
+  - Each category has a unique icon (DollarSign, Home, Tv, TrendingUp, PiggyBank from Lucide React)
+  - ConceptBox component updated with "expense" type in discriminated union
+  - Expenses card uses amber-green gradient background
+  - Amounts displayed with currency formatting using toLocaleString()
+  - Nested JSON structure parsed for expenses, subscriptions, investments totals and savings data
+  - Three cards (Events, Calendar, Expenses) now displayed in carousel

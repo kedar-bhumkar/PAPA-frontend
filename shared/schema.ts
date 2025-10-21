@@ -53,3 +53,17 @@ export const calendarEventSchema = z.object({
 });
 
 export type CalendarEventData = z.infer<typeof calendarEventSchema>;
+
+// Expense data structure (parsed from JSON)
+export const expenseDataSchema = z.object({
+  salary: z.number().optional(),
+  expenses: z.record(z.number()).optional(),
+  subscriptions: z.record(z.number()).optional(),
+  investments: z.record(z.number()).optional(),
+  savings: z.object({
+    net: z.number().optional(),
+    in_hand: z.number().optional(),
+  }).optional(),
+});
+
+export type ExpenseData = z.infer<typeof expenseDataSchema>;

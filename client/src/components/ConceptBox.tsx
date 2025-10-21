@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank } from "lucide-react";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
-export type ConceptItem = EventItem | CalendarItem;
+export type ConceptItem = EventItem | CalendarItem | ExpenseItem;
 
 export interface EventItem {
   type: "event";
@@ -19,6 +19,13 @@ export interface CalendarItem {
   summary: string;
   startTime: string;
   link?: string;
+}
+
+export interface ExpenseItem {
+  type: "expense";
+  category: string;
+  amount: number;
+  icon: "salary" | "expenses" | "subscriptions" | "investments" | "savings";
 }
 
 export interface ConceptBoxProps {
@@ -119,7 +126,7 @@ export default function ConceptBox({
                     )}
                   </div>
                 </>
-              ) : (
+              ) : item.type === "calendar" ? (
                 <>
                   <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-primary">
                     <span>{formatCalendarTime(item.startTime)}</span>
@@ -140,6 +147,29 @@ export default function ConceptBox({
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Expense Item */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+                        {item.icon === "salary" && <DollarSign className="h-5 w-5 text-primary" />}
+                        {item.icon === "expenses" && <Home className="h-5 w-5 text-primary" />}
+                        {item.icon === "subscriptions" && <Tv className="h-5 w-5 text-primary" />}
+                        {item.icon === "investments" && <TrendingUp className="h-5 w-5 text-primary" />}
+                        {item.icon === "savings" && <PiggyBank className="h-5 w-5 text-primary" />}
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                          {item.category}
+                        </div>
+                        <div className="text-lg font-bold text-card-foreground">
+                          ${item.amount.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </>
               )}
