@@ -1,8 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank } from "lucide-react";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import { useState } from "react";
 
 export type ConceptItem = EventItem | CalendarItem | ExpenseItem;
 
@@ -21,11 +23,17 @@ export interface CalendarItem {
   link?: string;
 }
 
+export interface ExpenseDetail {
+  label: string;
+  amount: number;
+}
+
 export interface ExpenseItem {
   type: "expense";
   category: string;
   amount: number;
   icon: "salary" | "expenses" | "subscriptions" | "investments" | "savings";
+  details?: ExpenseDetail[];
 }
 
 export interface ConceptBoxProps {
@@ -45,6 +53,88 @@ function formatCalendarTime(isoString: string): string {
   } catch {
     return isoString;
   }
+}
+
+// Expense Item Component with expand/collapse functionality
+function ExpenseItemComponent({ item, index }: { item: ExpenseItem; index: number }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const hasDetails = item.details && item.details.length > 0;
+
+  const IconComponent = {
+    salary: DollarSign,
+    expenses: Home,
+    subscriptions: Tv,
+    investments: TrendingUp,
+    savings: PiggyBank,
+  }[item.icon];
+
+  // If no details, render simple non-expandable item
+  if (!hasDetails) {
+    return (
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+            <IconComponent className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              {item.category}
+            </div>
+            <div className="text-lg font-bold text-card-foreground">
+              ${item.amount.toLocaleString()}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render expandable item with details
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger
+        className="w-full"
+        data-testid={`button-expand-expense-${index}`}
+      >
+        <div className="flex items-center justify-between gap-3 w-full">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+              <IconComponent className="h-5 w-5 text-primary" />
+            </div>
+            <div className="text-left">
+              <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                {item.category}
+              </div>
+              <div className="text-lg font-bold text-card-foreground">
+                ${item.amount.toLocaleString()}
+              </div>
+            </div>
+          </div>
+          <ChevronDown
+            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          />
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2">
+        <div className="space-y-1 pl-[52px] pr-6">
+          {item.details?.map((detail, detailIndex) => (
+            <div
+              key={detailIndex}
+              className="flex items-center justify-between text-sm py-1"
+              data-testid={`expense-detail-${index}-${detailIndex}`}
+            >
+              <span className="text-muted-foreground">{detail.label}</span>
+              <span className="font-medium text-card-foreground">
+                ${detail.amount.toLocaleString()}
+              </span>
+            </div>
+          ))}
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
 }
 
 export default function ConceptBox({
@@ -150,28 +240,7 @@ export default function ConceptBox({
                   </div>
                 </>
               ) : (
-                <>
-                  {/* Expense Item */}
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
-                        {item.icon === "salary" && <DollarSign className="h-5 w-5 text-primary" />}
-                        {item.icon === "expenses" && <Home className="h-5 w-5 text-primary" />}
-                        {item.icon === "subscriptions" && <Tv className="h-5 w-5 text-primary" />}
-                        {item.icon === "investments" && <TrendingUp className="h-5 w-5 text-primary" />}
-                        {item.icon === "savings" && <PiggyBank className="h-5 w-5 text-primary" />}
-                      </div>
-                      <div>
-                        <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                          {item.category}
-                        </div>
-                        <div className="text-lg font-bold text-card-foreground">
-                          ${item.amount.toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
+                <ExpenseItemComponent item={item} index={index} />
               )}
             </div>
           ))}
