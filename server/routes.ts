@@ -9,8 +9,102 @@ import {
   type EventData,
   type CalendarEventData,
   type ExpenseData,
+  type ExpenseItem,
+  type ExpenseDetail,
 } from "@shared/schema";
 import { and, eq, desc, sql } from "drizzle-orm";
+
+// Helper function to transform raw expense data into normalized expense items with details
+function transformExpenseData(data: ExpenseData): ExpenseItem[] {
+  const items: ExpenseItem[] = [];
+
+  // Helper to convert a record object into detail items, filtering out zero/null values
+  const recordToDetails = (record: Record<string, number> | undefined): ExpenseDetail[] => {
+    if (!record) return [];
+    return Object.entries(record)
+      .filter(([key, value]) => key !== 'total' && typeof value === 'number' && value > 0 && !isNaN(value))
+      .map(([label, amount]) => ({
+        label: label.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        amount,
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  };
+
+  // Salary (no details, just a single value)
+  if (data.salary && data.salary > 0) {
+    items.push({
+      category: "Salary",
+      amount: data.salary,
+      icon: "salary",
+    });
+  }
+
+  // Expenses with detailed breakdown
+  if (data.expenses) {
+    const total = data.expenses.total ?? 0;
+    const details = recordToDetails(data.expenses);
+    if (total > 0 || details.length > 0) {
+      items.push({
+        category: "Expenses",
+        amount: total,
+        icon: "expenses",
+        details: details.length > 0 ? details : undefined,
+      });
+    }
+  }
+
+  // Subscriptions with detailed breakdown
+  if (data.subscriptions) {
+    const total = data.subscriptions.total ?? 0;
+    const details = recordToDetails(data.subscriptions);
+    if (total > 0 || details.length > 0) {
+      items.push({
+        category: "Subscriptions",
+        amount: total,
+        icon: "subscriptions",
+        details: details.length > 0 ? details : undefined,
+      });
+    }
+  }
+
+  // Investments with detailed breakdown
+  if (data.investments) {
+    const total = data.investments.total ?? 0;
+    const details = recordToDetails(data.investments);
+    if (total > 0 || details.length > 0) {
+      items.push({
+        category: "Investments",
+        amount: total,
+        icon: "investments",
+        details: details.length > 0 ? details : undefined,
+      });
+    }
+  }
+
+  // Savings with net and in_hand breakdown
+  if (data.savings) {
+    const net = data.savings.net ?? 0;
+    const details: ExpenseDetail[] = [];
+    
+    if (data.savings.net && data.savings.net > 0) {
+      details.push({ label: "Net", amount: data.savings.net });
+    }
+    if (data.savings.in_hand && data.savings.in_hand > 0) {
+      details.push({ label: "In Hand", amount: data.savings.in_hand });
+    }
+
+    if (net > 0 || details.length > 0) {
+      items.push({
+        category: "Net Savings",
+        amount: net,
+        icon: "savings",
+        details: details.length > 0 ? details : undefined,
+      });
+    }
+  }
+
+  return items;
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get events from the latest successful event_agent record
@@ -112,7 +206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .orderBy(desc(agentData.createdAt))
         .limit(1);
 
-      let expenseData: ExpenseData | null = null;
+      let expenseItems: ExpenseItem[] = [];
 
       // Parse agent_response JSON from the latest record
       if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
@@ -122,13 +216,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const parsed = typeof response === 'string' ? JSON.parse(response) : response;
           
           // Validate against schema
-          expenseData = expenseDataSchema.parse(parsed);
+          const expenseData = expenseDataSchema.parse(parsed);
+          
+          // Transform raw data into normalized items with details
+          expenseItems = transformExpenseData(expenseData);
         } catch (parseError) {
           console.error("Error parsing expense agent_response:", parseError);
         }
       }
 
-      res.json(expenseData);
+      res.json(expenseItems);
     } catch (error) {
       console.error("Error fetching expenses:", error);
       res.status(500).json({ error: "Failed to fetch expenses" });
