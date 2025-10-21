@@ -3,7 +3,7 @@ import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
-import { type EventData, type CalendarEventData, type ExpenseData } from "@shared/schema";
+import { type EventData, type CalendarEventData, type ExpenseItem } from "@shared/schema";
 import eventBg1 from "@assets/generated_images/Event_card_gradient_background_8c68dd6e.png";
 import calendarBg from "@assets/generated_images/Calendar_card_gradient_background_f49550e0.png";
 import expensesBg from "@assets/generated_images/Expenses_card_gradient_background_dd3e9188.png";
@@ -17,7 +17,7 @@ export default function Home() {
     queryKey: ["/api/calendar"],
   });
 
-  const { data: expenses, isLoading: expensesLoading } = useQuery<ExpenseData | null>({
+  const { data: expenseItems, isLoading: expensesLoading } = useQuery<ExpenseItem[]>({
     queryKey: ["/api/expenses"],
   });
 
@@ -58,50 +58,18 @@ export default function Home() {
     });
   }
 
-  // Add Expenses card if we have expense data
-  if (expenses) {
-    const expenseItems = [
-      {
+  // Add Expenses card if we have expense items
+  if (expenseItems && expenseItems.length > 0) {
+    concepts.push({
+      title: "Financial Overview",
+      category: "Expenses",
+      imageUrl: expensesBg,
+      categoryColor: "bg-amber-500/20",
+      items: expenseItems.map((item) => ({
         type: "expense" as const,
-        category: "Salary",
-        amount: expenses.salary ?? 0,
-        icon: "salary" as const,
-      },
-      {
-        type: "expense" as const,
-        category: "Expenses",
-        amount: expenses.expenses?.total ?? 0,
-        icon: "expenses" as const,
-      },
-      {
-        type: "expense" as const,
-        category: "Subscriptions",
-        amount: expenses.subscriptions?.total ?? 0,
-        icon: "subscriptions" as const,
-      },
-      {
-        type: "expense" as const,
-        category: "Investments",
-        amount: expenses.investments?.total ?? 0,
-        icon: "investments" as const,
-      },
-      {
-        type: "expense" as const,
-        category: "Net Savings",
-        amount: expenses.savings?.net ?? 0,
-        icon: "savings" as const,
-      },
-    ].filter((item) => item.amount !== undefined);
-
-    if (expenseItems.length > 0) {
-      concepts.push({
-        title: "Financial Overview",
-        category: "Expenses",
-        imageUrl: expensesBg,
-        categoryColor: "bg-amber-500/20",
-        items: expenseItems,
-      });
-    }
+        ...item,
+      })),
+    });
   }
 
   const hasAnyData = concepts.length > 0;
