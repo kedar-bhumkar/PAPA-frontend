@@ -38,35 +38,27 @@ export interface ExpenseItem {
 
 export interface InvestmentItem {
   type: "investment";
-  us_projected_balance: {
+  us_current_balance: {
     amex: string;
     vanguard: string;
     crypto: string;
     stocks: string;
-    total?: string;
+    total: string;
   };
-  india_projected_balance: {
+  india_current_balance: {
     savings: string;
     stocks: string;
     FD: string;
     RD: string;
-    total?: string;
+    total: string;
   };
-  projection?: {
-    us_investments: string;
-    india_investments: string;
-  };
-  projection_12months?: {
+  projection_12months: {
     us_investments: string;
     india_investments: string;
   };
   advice?: {
     us_investments: string;
     india_investments: string;
-  };
-  suggestions?: {
-    us: string;
-    india: string;
   };
 }
 
@@ -275,25 +267,25 @@ export default function ConceptBox({
                 </>
               ) : item.type === "investment" ? (
                 <div className="space-y-4">
-                  {/* US Projected Balance */}
+                  {/* US Current Balance */}
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
-                      US Projected Balance
+                      US Current Balance
                     </div>
                     <div className="space-y-2">
                       {[
-                        { label: "Amex", value: item.us_projected_balance?.amex || "$0", Icon: CreditCard },
-                        { label: "Vanguard", value: item.us_projected_balance?.vanguard || "$0", Icon: LineChart },
-                        { label: "Crypto", value: item.us_projected_balance?.crypto || "$0", Icon: Bitcoin },
-                        { label: "Stocks", value: item.us_projected_balance?.stocks || "$0", Icon: BarChart3 },
-                      ].filter(account => account.value && account.value !== "$0" && account.value !== "0").map((account, i) => (
+                        { label: "Amex", value: item.us_current_balance.amex, Icon: CreditCard },
+                        { label: "Vanguard", value: item.us_current_balance.vanguard, Icon: LineChart },
+                        { label: "Crypto", value: item.us_current_balance.crypto, Icon: Bitcoin },
+                        { label: "Stocks", value: item.us_current_balance.stocks, Icon: BarChart3 },
+                      ].filter(account => account.value && account.value !== "0" && parseFloat(account.value) > 0).map((account, i) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <account.Icon className="h-4 w-4 text-primary" />
                             <span className="text-sm text-muted-foreground">{account.label}</span>
                           </div>
                           <span className="text-sm font-semibold text-card-foreground">
-                            ${parseFloat(account.value.replace(/[^0-9.-]+/g,"")).toLocaleString()}
+                            ${parseFloat(account.value).toLocaleString()}
                           </span>
                         </div>
                       ))}
@@ -302,31 +294,31 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Total US</span>
                         <span className="text-sm font-bold text-primary">
-                          ${parseFloat((item.projection_12months?.us_investments || item.projection?.us_investments || "0").replace(/[^0-9.-]+/g,"")).toLocaleString()}
+                          ${parseFloat(item.us_current_balance.total).toLocaleString()}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* India Projected Balance */}
+                  {/* India Current Balance */}
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
-                      India Projected Balance
+                      India Current Balance
                     </div>
                     <div className="space-y-2">
                       {[
-                        { label: "Savings", value: item.india_projected_balance?.savings || "0", Icon: Landmark },
-                        { label: "Stocks", value: item.india_projected_balance?.stocks || "0", Icon: BarChart3 },
-                        { label: "FD", value: item.india_projected_balance?.FD || "0", Icon: Vault },
-                        { label: "RD", value: item.india_projected_balance?.RD || "0", Icon: Repeat },
-                      ].filter(account => account.value && account.value !== "0" && parseFloat(account.value.replace(/[^0-9.-]+/g,"")) > 0).map((account, i) => (
+                        { label: "Savings", value: item.india_current_balance.savings, Icon: Landmark },
+                        { label: "Stocks", value: item.india_current_balance.stocks, Icon: BarChart3 },
+                        { label: "FD", value: item.india_current_balance.FD, Icon: Vault },
+                        { label: "RD", value: item.india_current_balance.RD, Icon: Repeat },
+                      ].filter(account => account.value && account.value !== "0" && parseFloat(account.value) > 0).map((account, i) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <account.Icon className="h-4 w-4 text-primary" />
                             <span className="text-sm text-muted-foreground">{account.label}</span>
                           </div>
                           <span className="text-sm font-semibold text-card-foreground">
-                            Rs {parseFloat(account.value.replace(/[^0-9.-]+/g,"")).toLocaleString()}
+                            Rs {parseFloat(account.value).toLocaleString()}
                           </span>
                         </div>
                       ))}
@@ -335,7 +327,28 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Total India</span>
                         <span className="text-sm font-bold text-primary">
-                          Rs {parseFloat((item.projection_12months?.india_investments || item.projection?.india_investments || "0").replace(/[^0-9.-]+/g,"")).toLocaleString()}
+                          Rs {parseFloat(item.india_current_balance.total).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 12-Month Projection */}
+                  <div className="border-t border-primary/20 pt-4">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+                      12-Month Projection
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">US Investments</span>
+                        <span className="text-sm font-semibold text-card-foreground">
+                          ${parseFloat(item.projection_12months.us_investments).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">India Investments</span>
+                        <span className="text-sm font-semibold text-card-foreground">
+                          Rs {parseFloat(item.projection_12months.india_investments).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -361,33 +374,6 @@ export default function ConceptBox({
                             <div className="text-xs font-medium text-muted-foreground mb-1">India Investments</div>
                             <div className="text-sm text-card-foreground line-clamp-2 group-hover:line-clamp-none transition-all cursor-help">
                               {item.advice.india_investments}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Suggestions Section */}
-                  {item.suggestions && (item.suggestions.us || item.suggestions.india) && (
-                    <div className="border-t border-primary/20 pt-4">
-                      <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
-                        Suggestions
-                      </div>
-                      <div className="space-y-2">
-                        {item.suggestions.us && (
-                          <div>
-                            <div className="text-xs font-medium text-muted-foreground mb-1">US</div>
-                            <div className="text-sm text-card-foreground">
-                              {item.suggestions.us}
-                            </div>
-                          </div>
-                        )}
-                        {item.suggestions.india && (
-                          <div>
-                            <div className="text-xs font-medium text-muted-foreground mb-1">India</div>
-                            <div className="text-sm text-card-foreground">
-                              {item.suggestions.india}
                             </div>
                           </div>
                         )}
