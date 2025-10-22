@@ -53,6 +53,16 @@ A visually stunning React application designed to showcase events, calendar item
   - India Projected Balance: Savings (Landmark icon), Stocks (BarChart3 icon), FD (Vault icon), RD (Repeat icon)
   - Total projections for both US and India investments
   - Clean sectioned layout with account-specific icons
+  - **Investment Advice section** with hover-to-expand functionality:
+    - Shows detailed financial advice for US and India investments
+    - Initially displays 2 lines of text (truncated)
+    - Hover over advice to expand and view full content
+    - Smooth transitions between truncated and expanded states
+  - **Suggestions section** with actionable recommendations:
+    - Displays concise, actionable suggestions for US and India
+    - Always fully visible (no truncation)
+  - Support for both old (projection) and new (projection_12months) data structures
+  - Currency formatting: $ for US amounts, Rs for India amounts
 - Backend transformation layer that filters, sorts, and formats expense data
 - Clickable external links that open in new tabs.
 - Automatic CST timezone conversion for calendar events.

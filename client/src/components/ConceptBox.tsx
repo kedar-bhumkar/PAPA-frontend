@@ -43,16 +43,30 @@ export interface InvestmentItem {
     vanguard: string;
     crypto: string;
     stocks: string;
+    total?: string;
   };
   india_projected_balance: {
     savings: string;
     stocks: string;
     FD: string;
     RD: string;
+    total?: string;
   };
-  projection: {
+  projection?: {
     us_investments: string;
     india_investments: string;
+  };
+  projection_12months?: {
+    us_investments: string;
+    india_investments: string;
+  };
+  advice?: {
+    us_investments: string;
+    india_investments: string;
+  };
+  suggestions?: {
+    us: string;
+    india: string;
   };
 }
 
@@ -279,7 +293,7 @@ export default function ConceptBox({
                             <span className="text-sm text-muted-foreground">{account.label}</span>
                           </div>
                           <span className="text-sm font-semibold text-card-foreground">
-                            {account.value}
+                            ${parseFloat(account.value.replace(/[^0-9.-]+/g,"")).toLocaleString()}
                           </span>
                         </div>
                       ))}
@@ -288,7 +302,7 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Total US</span>
                         <span className="text-sm font-bold text-primary">
-                          {item.projection?.us_investments || "$0"}
+                          ${parseFloat((item.projection_12months?.us_investments || item.projection?.us_investments || "0").replace(/[^0-9.-]+/g,"")).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -301,18 +315,18 @@ export default function ConceptBox({
                     </div>
                     <div className="space-y-2">
                       {[
-                        { label: "Savings", value: item.india_projected_balance?.savings || "Rs 0", Icon: Landmark },
-                        { label: "Stocks", value: item.india_projected_balance?.stocks || "Rs 0", Icon: BarChart3 },
-                        { label: "FD", value: item.india_projected_balance?.FD || "Rs 0", Icon: Vault },
-                        { label: "RD", value: item.india_projected_balance?.RD || "Rs 0", Icon: Repeat },
-                      ].filter(account => account.value && account.value !== "Rs 0" && account.value !== "0").map((account, i) => (
+                        { label: "Savings", value: item.india_projected_balance?.savings || "0", Icon: Landmark },
+                        { label: "Stocks", value: item.india_projected_balance?.stocks || "0", Icon: BarChart3 },
+                        { label: "FD", value: item.india_projected_balance?.FD || "0", Icon: Vault },
+                        { label: "RD", value: item.india_projected_balance?.RD || "0", Icon: Repeat },
+                      ].filter(account => account.value && account.value !== "0" && parseFloat(account.value.replace(/[^0-9.-]+/g,"")) > 0).map((account, i) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <account.Icon className="h-4 w-4 text-primary" />
                             <span className="text-sm text-muted-foreground">{account.label}</span>
                           </div>
                           <span className="text-sm font-semibold text-card-foreground">
-                            {account.value}
+                            Rs {parseFloat(account.value.replace(/[^0-9.-]+/g,"")).toLocaleString()}
                           </span>
                         </div>
                       ))}
@@ -321,11 +335,65 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Total India</span>
                         <span className="text-sm font-bold text-primary">
-                          {item.projection?.india_investments || "Rs 0"}
+                          Rs {parseFloat((item.projection_12months?.india_investments || item.projection?.india_investments || "0").replace(/[^0-9.-]+/g,"")).toLocaleString()}
                         </span>
                       </div>
                     </div>
                   </div>
+
+                  {/* Advice Section */}
+                  {item.advice && (item.advice.us_investments || item.advice.india_investments) && (
+                    <div className="border-t border-primary/20 pt-4">
+                      <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+                        Investment Advice
+                      </div>
+                      <div className="space-y-3">
+                        {item.advice.us_investments && (
+                          <div className="group relative">
+                            <div className="text-xs font-medium text-muted-foreground mb-1">US Investments</div>
+                            <div className="text-sm text-card-foreground line-clamp-2 group-hover:line-clamp-none transition-all cursor-help">
+                              {item.advice.us_investments}
+                            </div>
+                          </div>
+                        )}
+                        {item.advice.india_investments && (
+                          <div className="group relative">
+                            <div className="text-xs font-medium text-muted-foreground mb-1">India Investments</div>
+                            <div className="text-sm text-card-foreground line-clamp-2 group-hover:line-clamp-none transition-all cursor-help">
+                              {item.advice.india_investments}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Suggestions Section */}
+                  {item.suggestions && (item.suggestions.us || item.suggestions.india) && (
+                    <div className="border-t border-primary/20 pt-4">
+                      <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+                        Suggestions
+                      </div>
+                      <div className="space-y-2">
+                        {item.suggestions.us && (
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground mb-1">US</div>
+                            <div className="text-sm text-card-foreground">
+                              {item.suggestions.us}
+                            </div>
+                          </div>
+                        )}
+                        {item.suggestions.india && (
+                          <div>
+                            <div className="text-xs font-medium text-muted-foreground mb-1">India</div>
+                            <div className="text-sm text-card-foreground">
+                              {item.suggestions.india}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : item.type === "expense" ? (
                 <ExpenseItemComponent item={item} index={index} />

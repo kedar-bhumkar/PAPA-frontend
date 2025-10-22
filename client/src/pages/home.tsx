@@ -78,7 +78,7 @@ export default function Home() {
   }
 
   // Add Investment card if we have valid investment data
-  if (investmentData && investmentData.us_projected_balance && investmentData.india_projected_balance && investmentData.projection) {
+  if (investmentData && investmentData.us_projected_balance && investmentData.india_projected_balance && (investmentData.projection || investmentData.projection_12months)) {
     concepts.push({
       title: "Investment Portfolio",
       category: "Investments",

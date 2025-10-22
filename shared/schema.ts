@@ -93,21 +93,31 @@ export const investmentDataSchema = z.object({
     vanguard: z.string(),
     crypto: z.string(),
     stocks: z.string(),
+    total: z.string().optional(),
   }),
   india_projected_balance: z.object({
     savings: z.string(),
     stocks: z.string(),
     FD: z.string(),
     RD: z.string(),
+    total: z.string().optional(),
   }),
+  // Support both old 'projection' and new 'projection_12months'
   projection: z.object({
     us_investments: z.string(),
     india_investments: z.string(),
-  }),
+  }).optional(),
+  projection_12months: z.object({
+    us_investments: z.string(),
+    india_investments: z.string(),
+  }).optional(),
   advice: z.object({
     us_investments: z.string(),
     india_investments: z.string(),
-    notes: z.string(),
+  }).optional(),
+  suggestions: z.object({
+    us: z.string(),
+    india: z.string(),
   }).optional(),
 });
 
