@@ -268,11 +268,11 @@ export default function ConceptBox({
                     </div>
                     <div className="space-y-2">
                       {[
-                        { label: "Amex", value: item.us_projected_balance.amex, Icon: CreditCard },
-                        { label: "Vanguard", value: item.us_projected_balance.vanguard, Icon: LineChart },
-                        { label: "Crypto", value: item.us_projected_balance.crypto, Icon: Bitcoin },
-                        { label: "Stocks", value: item.us_projected_balance.stocks, Icon: BarChart3 },
-                      ].map((account, i) => (
+                        { label: "Amex", value: item.us_projected_balance?.amex || "$0", Icon: CreditCard },
+                        { label: "Vanguard", value: item.us_projected_balance?.vanguard || "$0", Icon: LineChart },
+                        { label: "Crypto", value: item.us_projected_balance?.crypto || "$0", Icon: Bitcoin },
+                        { label: "Stocks", value: item.us_projected_balance?.stocks || "$0", Icon: BarChart3 },
+                      ].filter(account => account.value && account.value !== "$0" && account.value !== "0").map((account, i) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <account.Icon className="h-4 w-4 text-primary" />
@@ -288,7 +288,7 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Total US</span>
                         <span className="text-sm font-bold text-primary">
-                          {item.projection.us_investments}
+                          {item.projection?.us_investments || "$0"}
                         </span>
                       </div>
                     </div>
@@ -301,11 +301,11 @@ export default function ConceptBox({
                     </div>
                     <div className="space-y-2">
                       {[
-                        { label: "Savings", value: item.india_projected_balance.savings, Icon: Landmark },
-                        { label: "Stocks", value: item.india_projected_balance.stocks, Icon: BarChart3 },
-                        { label: "FD", value: item.india_projected_balance.FD, Icon: Vault },
-                        { label: "RD", value: item.india_projected_balance.RD, Icon: Repeat },
-                      ].map((account, i) => (
+                        { label: "Savings", value: item.india_projected_balance?.savings || "Rs 0", Icon: Landmark },
+                        { label: "Stocks", value: item.india_projected_balance?.stocks || "Rs 0", Icon: BarChart3 },
+                        { label: "FD", value: item.india_projected_balance?.FD || "Rs 0", Icon: Vault },
+                        { label: "RD", value: item.india_projected_balance?.RD || "Rs 0", Icon: Repeat },
+                      ].filter(account => account.value && account.value !== "Rs 0" && account.value !== "0").map((account, i) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <account.Icon className="h-4 w-4 text-primary" />
@@ -321,7 +321,7 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Total India</span>
                         <span className="text-sm font-bold text-primary">
-                          {item.projection.india_investments}
+                          {item.projection?.india_investments || "Rs 0"}
                         </span>
                       </div>
                     </div>

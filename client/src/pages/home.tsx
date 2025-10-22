@@ -77,8 +77,8 @@ export default function Home() {
     });
   }
 
-  // Add Investment card if we have investment data
-  if (investmentData) {
+  // Add Investment card if we have valid investment data
+  if (investmentData && investmentData.us_projected_balance && investmentData.india_projected_balance && investmentData.projection) {
     concepts.push({
       title: "Investment Portfolio",
       category: "Investments",
