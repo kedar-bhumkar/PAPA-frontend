@@ -1,0 +1,23 @@
+{
+  "us_projected_balance": {
+    "amex": "$125,243",
+    "vanguard": "$86,128",
+    "crypto": "$63,087",
+    "stocks": "$9,000"
+  },
+  "india_projected_balance": {
+    "savings": "Rs 453,376",
+    "stocks": "Rs 58,001",
+    "FD": "Rs 5,825,820",
+    "RD": "Rs 0"
+  },
+  "projection": {
+    "us_investments": "$298,458",
+    "india_investments": "Rs 6,337,197"
+  },
+  "advice": {
+    "us_investments": "Consider increasing your contribution to the Vanguard fund (VFIAX) given its past ~14% annual return, which outpaces your cash savings. Also your cash savings (Amex) is earning ~3.5% APY — good for liquidity, but low growth vs equities. Given you have crypto (volatile) and small stock allocations, you might consider: (1) reallocating some of the low-yield cash into equities or index funds; (2) diversifying across sectors/stocks beyond your current picks — e.g., consider a broad US small-cap or international index fund. In the US market I’d also suggest evaluating high-quality dividend stocks or funds for balance. On crypto: consider whether your allocation fits your risk tolerance, and lock in some gains or shift into more diversified crypto/traditional asset mix if you’re uncomfortable with volatility.",
+    "india_investments": "Your FD in India at 6.5% is solid for fixed income. The savings account at 3% is very low — you may consider moving excess cash into higher-yield savings/investment vehicles (e.g., debt mutual funds, short-term bond funds) in India. For your Indian equities (Persistent Systems only) you’re very concentrated — consider diversifying into a broader India equity index fund or sector-diversified large-cap stocks, perhaps a multi-cap Indian mutual fund. Also evaluate inflation risk: 6.5% in FD may beat inflation marginally, but having some growth equity exposure helps long term.",
+    "notes": "All projections assume monthly compounding, fixed interest/deposit amounts, and flat crypto/stock prices unless otherwise noted. Real returns will vary."
+  }
+}
