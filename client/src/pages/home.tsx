@@ -3,10 +3,11 @@ import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
-import { type EventData, type CalendarEventData, type ExpenseItem } from "@shared/schema";
+import { type EventData, type CalendarEventData, type ExpenseItem, type InvestmentData } from "@shared/schema";
 import eventBg1 from "@assets/generated_images/Event_card_gradient_background_8c68dd6e.png";
 import calendarBg from "@assets/generated_images/Calendar_card_gradient_background_f49550e0.png";
 import expensesBg from "@assets/generated_images/Expenses_card_gradient_background_dd3e9188.png";
+import investmentBg from "@assets/generated_images/Investment_card_gradient_background_8a3e8035.png";
 
 export default function Home() {
   const { data: events, isLoading: eventsLoading } = useQuery<EventData[]>({
@@ -21,7 +22,11 @@ export default function Home() {
     queryKey: ["/api/expenses"],
   });
 
-  const isLoading = eventsLoading || calendarLoading || expensesLoading;
+  const { data: investmentData, isLoading: investmentsLoading } = useQuery<InvestmentData>({
+    queryKey: ["/api/investments"],
+  });
+
+  const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading;
 
   const concepts: ConceptBoxProps[] = [];
 
@@ -69,6 +74,20 @@ export default function Home() {
         type: "expense" as const,
         ...item,
       })),
+    });
+  }
+
+  // Add Investment card if we have investment data
+  if (investmentData) {
+    concepts.push({
+      title: "Investment Portfolio",
+      category: "Investments",
+      imageUrl: investmentBg,
+      categoryColor: "bg-emerald-500/20",
+      items: [{
+        type: "investment" as const,
+        ...investmentData,
+      }],
     });
   }
 
