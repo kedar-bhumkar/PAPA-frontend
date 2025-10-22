@@ -362,17 +362,23 @@ export default function ConceptBox({
                       </div>
                       <div className="space-y-3">
                         {item.advice.us_investments && (
-                          <div className="group relative">
+                          <div>
                             <div className="text-xs font-medium text-muted-foreground mb-1">US Investments</div>
-                            <div className="text-sm text-card-foreground line-clamp-2 group-hover:line-clamp-none transition-all cursor-help">
+                            <div 
+                              className="text-sm text-card-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help"
+                              data-testid="text-advice-us"
+                            >
                               {item.advice.us_investments}
                             </div>
                           </div>
                         )}
                         {item.advice.india_investments && (
-                          <div className="group relative">
+                          <div>
                             <div className="text-xs font-medium text-muted-foreground mb-1">India Investments</div>
-                            <div className="text-sm text-card-foreground line-clamp-2 group-hover:line-clamp-none transition-all cursor-help">
+                            <div 
+                              className="text-sm text-card-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help"
+                              data-testid="text-advice-india"
+                            >
                               {item.advice.india_investments}
                             </div>
                           </div>
