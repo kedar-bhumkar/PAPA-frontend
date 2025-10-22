@@ -203,7 +203,7 @@ export default function ConceptBox({
         </h3>
 
         {/* Items List - Compact single-line format */}
-        <div className="flex-1 space-y-3 overflow-y-auto">
+        <div className="flex-1 space-y-3 overflow-y-auto hide-scrollbar">
           {items.map((item, index) => (
             <div
               key={index}
@@ -334,6 +334,15 @@ export default function ConceptBox({
           ))}
         </div>
       </div>
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </Card>
   );
 }

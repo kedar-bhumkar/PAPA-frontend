@@ -54,7 +54,7 @@ export default function ConceptCarousel({ concepts }: ConceptCarouselProps) {
           size="icon"
           variant="default"
           onClick={() => scroll("left")}
-          className="absolute left-2 top-1/2 z-20 -translate-y-1/2 h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 animate-fade-in"
+          className="absolute left-1/2 -translate-x-16 top-1/2 z-20 -translate-y-1/2 h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 animate-fade-in"
           data-testid="button-scroll-left"
         >
           <ChevronLeft className="h-7 w-7 text-primary-foreground" />
@@ -88,7 +88,7 @@ export default function ConceptCarousel({ concepts }: ConceptCarouselProps) {
           size="icon"
           variant="default"
           onClick={() => scroll("right")}
-          className="absolute right-2 top-1/2 z-20 -translate-y-1/2 h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 animate-fade-in"
+          className="absolute left-1/2 translate-x-4 top-1/2 z-20 -translate-y-1/2 h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 animate-fade-in"
           data-testid="button-scroll-right"
         >
           <ChevronRight className="h-7 w-7 text-primary-foreground" />
