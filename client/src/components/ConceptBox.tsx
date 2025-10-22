@@ -166,7 +166,7 @@ export default function ConceptBox({
 }: ConceptBoxProps) {
   return (
     <Card
-      className="group relative h-[480px] w-[380px] flex-shrink-0 overflow-hidden border-card-border hover-elevate active-elevate-2 transition-all duration-300"
+      className="group relative h-[calc(100vh-200px)] w-[380px] flex-shrink-0 overflow-hidden border-card-border hover-elevate active-elevate-2 transition-all duration-300"
       data-testid={`card-concept-${title.toLowerCase().replace(/\s+/g, '-')}`}
     >
       {/* Background Image with Gradient Overlay */}

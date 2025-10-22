@@ -1,0 +1,27 @@
+{
+  "us_projected_balance": {
+    "amex": "121672",
+    "vanguard": "84632",
+    "crypto": "64126",
+    "stocks": "6995",
+    "total": "292425"
+  },
+  "india_projected_balance": {
+    "savings": "453200",
+    "stocks": "57970",
+    "FD": "5861900",
+    "RD": "0",
+    "total": "6373070"
+  },
+  "projection_12months": {
+    "us_investments": "292425",
+    "india_investments": "6373070"
+  },
+  "advice": {
+    "us_investments": "Consider increasing monthly contributions to your Vanguard index fund since long-term stock-market exposure (via the S&P 500 via VFIAX) has historically provided strong real returns (~10-15% p.a.). Also, review your stock holdings: some positions (e.g., AGEN) are very small and speculative; you might want to consolidate into fewer well-researched names. Given the size of your crypto (≈ $64k) relative to your total US portfolio (~$292k), ensure you are comfortable with high volatility. You might want to cap crypto exposure to e.g. 5-10% of total US portfolio and perhaps redeploy some into diversification (e.g., a broad-market ETF or dividend fund). Consider also whether the $15k sitting in BOFA with no growth should be moved into something higher yield (e.g., a short-term bond fund or higher-yield savings account).",
+    "india_investments": "For your India holdings: Your FD at 6.5% is decent in the current environment, but given inflation, real return may be modest; you might consider a portion in Indian equity mutual funds to capture growth. Your savings account at 3% is very low yield — perhaps shift excess liquidity into a higher-interest savings/FDR or debt fund. For the 10 shares of Persistent Systems (~Rs 57,970) you might want to diversify into a broader Indian index fund (e.g., Nifty 50 or Sensex tracking) rather than one single stock. Also review tax and currency risks if you’re maintaining dual-country investments.",
+  "suggestions": {
+    "us": "Increase allocation into VFIAX (or similar broad US index fund), reduce speculative single stocks/crypto exposure, consider bond allocation as hedge.",
+    "india": "Open an Indian equity mutual fund SIP for diversification beyond a single stock; shift savings into higher-yield instruments; consider higher-yield FD laddering or inflation-indexed bonds."
+  }
+}

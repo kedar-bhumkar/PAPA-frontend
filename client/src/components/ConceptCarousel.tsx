@@ -48,18 +48,29 @@ export default function ConceptCarousel({ concepts }: ConceptCarouselProps) {
 
   return (
     <div className="relative w-full">
-      {/* Left Arrow - Only show if can scroll */}
-      {canScrollLeft && (
+      {/* Top Navigation - Side by Side */}
+      <div className="absolute left-1/2 -translate-x-1/2 top-4 z-20 flex gap-2">
         <Button
           size="icon"
           variant="default"
           onClick={() => scroll("left")}
-          className="absolute left-1/2 -translate-x-16 top-1/2 z-20 -translate-y-1/2 h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 animate-fade-in"
-          data-testid="button-scroll-left"
+          className={`h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 ${canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          data-testid="button-scroll-left-top"
+          disabled={!canScrollLeft}
         >
           <ChevronLeft className="h-7 w-7 text-primary-foreground" />
         </Button>
-      )}
+        <Button
+          size="icon"
+          variant="default"
+          onClick={() => scroll("right")}
+          className={`h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 ${canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          data-testid="button-scroll-right-top"
+          disabled={!canScrollRight}
+        >
+          <ChevronRight className="h-7 w-7 text-primary-foreground" />
+        </Button>
+      </div>
 
       {/* Scrollable Container */}
       <div
@@ -82,18 +93,29 @@ export default function ConceptCarousel({ concepts }: ConceptCarouselProps) {
         ))}
       </div>
 
-      {/* Right Arrow - Only show if can scroll */}
-      {canScrollRight && (
+      {/* Bottom Navigation - Side by Side */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-20 flex gap-2">
+        <Button
+          size="icon"
+          variant="default"
+          onClick={() => scroll("left")}
+          className={`h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 ${canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          data-testid="button-scroll-left-bottom"
+          disabled={!canScrollLeft}
+        >
+          <ChevronLeft className="h-7 w-7 text-primary-foreground" />
+        </Button>
         <Button
           size="icon"
           variant="default"
           onClick={() => scroll("right")}
-          className="absolute left-1/2 translate-x-4 top-1/2 z-20 -translate-y-1/2 h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 animate-fade-in"
-          data-testid="button-scroll-right"
+          className={`h-12 w-12 rounded-full bg-primary/90 hover:bg-primary shadow-2xl backdrop-blur-md transition-all hover:scale-110 ${canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          data-testid="button-scroll-right-bottom"
+          disabled={!canScrollRight}
         >
           <ChevronRight className="h-7 w-7 text-primary-foreground" />
         </Button>
-      )}
+      </div>
 
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {

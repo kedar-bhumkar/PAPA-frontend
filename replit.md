@@ -11,7 +11,8 @@ A visually stunning React application designed to showcase events, calendar item
 - Calendar items displayed with formatted CST time and summary
 - Expenses displayed with category icons and formatted currency amounts
 - Investment portfolio displayed with US and India projected balances with appropriate icons
-- Navigation arrows positioned near each other at the center of the screen (not at edges)
+- Full-height cards utilizing available vertical space (calc(100vh - 200px))
+- Navigation arrows at both TOP and BOTTOM of screen, side by side at each position
 - Only horizontal scrolling enabled (no vertical scrollbars on cards)
 
 ## System Architecture
@@ -22,11 +23,11 @@ A visually stunning React application designed to showcase events, calendar item
 - **Data Fetching**: TanStack Query
 - **Styling**: Tailwind CSS with Shadcn/ui components
 - **Fonts**: Inter and Manrope
-- **UI/UX**: Dark/light theme, gradient title, smooth animations, responsive design, shimmer loading skeletons, smart navigation arrows positioned at center (show/hide based on scroll state), horizontal-only scrolling with fixed 480px card height.
+- **UI/UX**: Dark/light theme, gradient title, smooth animations, responsive design, shimmer loading skeletons, dual navigation arrows (positioned at both top and bottom, side by side, show/hide based on scroll state), horizontal-only scrolling with full-height cards (calc(100vh - 200px)).
 - **Core Components**:
-    - `ConceptBox`: Displays events, calendar items, expenses, and investments with type discrimination and unique gradient backgrounds. Fixed 480px height with overflow-y-auto and CSS-hidden scrollbars (maintains scrolling functionality while appearing scrollbar-free).
+    - `ConceptBox`: Displays events, calendar items, expenses, and investments with type discrimination and unique gradient backgrounds. Full-height cards (calc(100vh - 200px)) with overflow-y-auto and CSS-hidden scrollbars (maintains scrolling functionality while appearing scrollbar-free).
     - `ExpenseItemComponent`: Handles expandable/collapsible expense categories with independent state and smooth animations.
-    - `ConceptCarousel`: Manages horizontal scrolling with center-positioned navigation arrows that appear/disappear based on scroll state.
+    - `ConceptCarousel`: Manages horizontal scrolling with dual navigation arrows at top and bottom positions. Each position has left and right arrows side by side, centered horizontally. Arrows intelligently appear/disappear based on scroll state using opacity transitions.
     - `ThemeToggle`: For dark/light mode switching.
 
 ### Backend
