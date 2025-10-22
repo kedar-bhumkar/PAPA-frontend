@@ -50,15 +50,15 @@ A visually stunning React application designed to showcase events, calendar item
   - Multiple categories can be expanded simultaneously
 - **Investment portfolio display** with current balances and projections:
   - **US Current Balance**: Amex (CreditCard icon), Vanguard (LineChart icon), Crypto (Bitcoin icon), Stocks (BarChart3 icon)
-    - Individual account balances formatted with $ prefix and comma separators
+    - Individual account balances displayed as pre-formatted strings (e.g., "$2203,357.00")
     - Total US from us_current_balance.total field
   - **India Current Balance**: Savings (Landmark icon), Stocks (BarChart3 icon), FD (Vault icon), RD (Repeat icon)
-    - Individual account balances formatted with Rs prefix and comma separators
+    - Individual account balances displayed as pre-formatted strings (e.g., "₹440,000.00")
     - Total India from india_current_balance.total field
-    - Zero-value accounts (e.g., RD: 0) are filtered out from display
+    - Empty string values (e.g., RD: "") are filtered out from display
   - **12-Month Projection section** showing future investment values:
-    - US Investments: Projected balance in 12 months (formatted with $)
-    - India Investments: Projected balance in 12 months (formatted with Rs)
+    - US Investments: Projected balance displayed as pre-formatted string (e.g., "$287,631.96")
+    - India Investments: Projected balance displayed as pre-formatted string (e.g., "₹6,336,609.00")
     - Clean horizontal layout with clear labels
   - **Investment Advice section** with hover-to-expand functionality:
     - Shows detailed financial advice for US and India investments
@@ -66,7 +66,7 @@ A visually stunning React application designed to showcase events, calendar item
     - Hover directly over advice text to expand and view full content
     - Smooth 200ms transitions between truncated and expanded states
     - Uses direct hover (not group-hover) for reliable interaction
-  - Currency formatting: $ for US amounts, Rs for India amounts with toLocaleString() for comma separators
+  - Currency values: All amounts come pre-formatted from API with currency symbols ($, ₹), comma separators, and decimal places already included. No client-side formatting is applied.
 - Backend transformation layer that filters, sorts, and formats expense data
 - Clickable external links that open in new tabs.
 - Automatic CST timezone conversion for calendar events.

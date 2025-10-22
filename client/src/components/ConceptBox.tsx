@@ -278,14 +278,14 @@ export default function ConceptBox({
                         { label: "Vanguard", value: item.us_current_balance.vanguard, Icon: LineChart },
                         { label: "Crypto", value: item.us_current_balance.crypto, Icon: Bitcoin },
                         { label: "Stocks", value: item.us_current_balance.stocks, Icon: BarChart3 },
-                      ].filter(account => account.value && account.value !== "0" && parseFloat(account.value) > 0).map((account, i) => (
+                      ].filter(account => account.value && account.value.trim() !== "" && account.value !== "$0" && account.value !== "$0.00").map((account, i) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <account.Icon className="h-4 w-4 text-primary" />
                             <span className="text-sm text-muted-foreground">{account.label}</span>
                           </div>
                           <span className="text-sm font-semibold text-card-foreground">
-                            ${parseFloat(account.value).toLocaleString()}
+                            {account.value}
                           </span>
                         </div>
                       ))}
@@ -294,7 +294,7 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Total US</span>
                         <span className="text-sm font-bold text-primary">
-                          ${parseFloat(item.us_current_balance.total).toLocaleString()}
+                          {item.us_current_balance.total}
                         </span>
                       </div>
                     </div>
@@ -311,14 +311,14 @@ export default function ConceptBox({
                         { label: "Stocks", value: item.india_current_balance.stocks, Icon: BarChart3 },
                         { label: "FD", value: item.india_current_balance.FD, Icon: Vault },
                         { label: "RD", value: item.india_current_balance.RD, Icon: Repeat },
-                      ].filter(account => account.value && account.value !== "0" && parseFloat(account.value) > 0).map((account, i) => (
+                      ].filter(account => account.value && account.value.trim() !== "" && account.value !== "₹0" && account.value !== "₹0.00").map((account, i) => (
                         <div key={i} className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <account.Icon className="h-4 w-4 text-primary" />
                             <span className="text-sm text-muted-foreground">{account.label}</span>
                           </div>
                           <span className="text-sm font-semibold text-card-foreground">
-                            Rs {parseFloat(account.value).toLocaleString()}
+                            {account.value}
                           </span>
                         </div>
                       ))}
@@ -327,7 +327,7 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Total India</span>
                         <span className="text-sm font-bold text-primary">
-                          Rs {parseFloat(item.india_current_balance.total).toLocaleString()}
+                          {item.india_current_balance.total}
                         </span>
                       </div>
                     </div>
@@ -342,13 +342,13 @@ export default function ConceptBox({
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">US Investments</span>
                         <span className="text-sm font-semibold text-card-foreground">
-                          ${parseFloat(item.projection_12months.us_investments).toLocaleString()}
+                          {item.projection_12months.us_investments}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-muted-foreground">India Investments</span>
                         <span className="text-sm font-semibold text-card-foreground">
-                          Rs {parseFloat(item.projection_12months.india_investments).toLocaleString()}
+                          {item.projection_12months.india_investments}
                         </span>
                       </div>
                     </div>
