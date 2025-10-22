@@ -1,12 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown } from "lucide-react";
+import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat } from "lucide-react";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
 
-export type ConceptItem = EventItem | CalendarItem | ExpenseItem;
+export type ConceptItem = EventItem | CalendarItem | ExpenseItem | InvestmentItem;
 
 export interface EventItem {
   type: "event";
@@ -34,6 +34,26 @@ export interface ExpenseItem {
   amount: number;
   icon: "salary" | "expenses" | "subscriptions" | "investments" | "savings";
   details?: ExpenseDetail[];
+}
+
+export interface InvestmentItem {
+  type: "investment";
+  us_projected_balance: {
+    amex: string;
+    vanguard: string;
+    crypto: string;
+    stocks: string;
+  };
+  india_projected_balance: {
+    savings: string;
+    stocks: string;
+    FD: string;
+    RD: string;
+  };
+  projection: {
+    us_investments: string;
+    india_investments: string;
+  };
 }
 
 export interface ConceptBoxProps {
@@ -239,9 +259,77 @@ export default function ConceptBox({
                     )}
                   </div>
                 </>
-              ) : (
+              ) : item.type === "investment" ? (
+                <div className="space-y-4">
+                  {/* US Projected Balance */}
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+                      US Projected Balance
+                    </div>
+                    <div className="space-y-2">
+                      {[
+                        { label: "Amex", value: item.us_projected_balance.amex, Icon: CreditCard },
+                        { label: "Vanguard", value: item.us_projected_balance.vanguard, Icon: LineChart },
+                        { label: "Crypto", value: item.us_projected_balance.crypto, Icon: Bitcoin },
+                        { label: "Stocks", value: item.us_projected_balance.stocks, Icon: BarChart3 },
+                      ].map((account, i) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <account.Icon className="h-4 w-4 text-primary" />
+                            <span className="text-sm text-muted-foreground">{account.label}</span>
+                          </div>
+                          <span className="text-sm font-semibold text-card-foreground">
+                            {account.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-primary/20">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-muted-foreground">Total US</span>
+                        <span className="text-sm font-bold text-primary">
+                          {item.projection.us_investments}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* India Projected Balance */}
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+                      India Projected Balance
+                    </div>
+                    <div className="space-y-2">
+                      {[
+                        { label: "Savings", value: item.india_projected_balance.savings, Icon: Landmark },
+                        { label: "Stocks", value: item.india_projected_balance.stocks, Icon: BarChart3 },
+                        { label: "FD", value: item.india_projected_balance.FD, Icon: Vault },
+                        { label: "RD", value: item.india_projected_balance.RD, Icon: Repeat },
+                      ].map((account, i) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <account.Icon className="h-4 w-4 text-primary" />
+                            <span className="text-sm text-muted-foreground">{account.label}</span>
+                          </div>
+                          <span className="text-sm font-semibold text-card-foreground">
+                            {account.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-primary/20">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-muted-foreground">Total India</span>
+                        <span className="text-sm font-bold text-primary">
+                          {item.projection.india_investments}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : item.type === "expense" ? (
                 <ExpenseItemComponent item={item} index={index} />
-              )}
+              ) : null}
             </div>
           ))}
         </div>
