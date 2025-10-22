@@ -88,36 +88,27 @@ export type ExpenseItem = z.infer<typeof expenseItemSchema>;
 
 // Investment data structure (parsed from JSON)
 export const investmentDataSchema = z.object({
-  us_projected_balance: z.object({
+  us_current_balance: z.object({
     amex: z.string(),
     vanguard: z.string(),
     crypto: z.string(),
     stocks: z.string(),
-    total: z.string().optional(),
+    total: z.string(),
   }),
-  india_projected_balance: z.object({
+  india_current_balance: z.object({
     savings: z.string(),
     stocks: z.string(),
     FD: z.string(),
     RD: z.string(),
-    total: z.string().optional(),
+    total: z.string(),
   }),
-  // Support both old 'projection' and new 'projection_12months'
-  projection: z.object({
-    us_investments: z.string(),
-    india_investments: z.string(),
-  }).optional(),
   projection_12months: z.object({
     us_investments: z.string(),
     india_investments: z.string(),
-  }).optional(),
+  }),
   advice: z.object({
     us_investments: z.string(),
     india_investments: z.string(),
-  }).optional(),
-  suggestions: z.object({
-    us: z.string(),
-    india: z.string(),
   }).optional(),
 });
 
