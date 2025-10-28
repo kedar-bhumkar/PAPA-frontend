@@ -50,6 +50,7 @@ export const calendarEventSchema = z.object({
   startTime: z.string(),
   link: z.string(),
   id: z.string(),
+  research: z.string().optional(),
 });
 
 export type CalendarEventData = z.infer<typeof calendarEventSchema>;

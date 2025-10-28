@@ -21,12 +21,22 @@ function transformExpenseData(data: ExpenseData): ExpenseItem[] {
   const items: ExpenseItem[] = [];
 
   // Helper to convert a record object into detail items, filtering out zero/null values
-  const recordToDetails = (record: Record<string, number> | undefined): ExpenseDetail[] => {
+  const recordToDetails = (
+    record: Record<string, number> | undefined,
+  ): ExpenseDetail[] => {
     if (!record) return [];
     return Object.entries(record)
-      .filter(([key, value]) => key !== 'total' && typeof value === 'number' && value > 0 && !isNaN(value))
+      .filter(
+        ([key, value]) =>
+          key !== "total" &&
+          typeof value === "number" &&
+          value > 0 &&
+          !isNaN(value),
+      )
       .map(([label, amount]) => ({
-        label: label.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        label: label
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase()),
         amount,
       }))
       .sort((a, b) => b.amount - a.amount);
@@ -87,7 +97,7 @@ function transformExpenseData(data: ExpenseData): ExpenseItem[] {
   if (data.savings) {
     const net = data.savings.net ?? 0;
     const details: ExpenseDetail[] = [];
-    
+
     if (data.savings.net && data.savings.net > 0) {
       details.push({ label: "Net", amount: data.savings.net });
     }
@@ -120,8 +130,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(
           and(
             eq(agentData.agentName, "event_agent"),
-            sql`TRIM(${agentData.status}) = 'success'`
-          )
+            sql`TRIM(${agentData.status}) = 'success'`,
+          ),
         )
         .orderBy(desc(agentData.createdAt))
         .limit(1);
@@ -157,8 +167,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(
           and(
             eq(agentData.agentName, "calendar_agent"),
-            sql`TRIM(${agentData.status}) = 'success'`
-          )
+            sql`TRIM(${agentData.status}) = 'success'`,
+          ),
         )
         .orderBy(desc(agentData.createdAt))
         .limit(1);
@@ -171,12 +181,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           // Handle case where agentResponse might already be parsed or is a string
           const response = latestRecord[0].agentResponse;
-          const parsed = typeof response === 'string' ? JSON.parse(response) : response;
-          
+          const parsed =
+            typeof response === "string" ? JSON.parse(response) : response;
+
           // Validate it's an array
           if (Array.isArray(parsed)) {
-            allCalendarEvents = parsed.map(event => 
-              calendarEventSchema.parse(event)
+            allCalendarEvents = parsed.map((event) =>
+              calendarEventSchema.parse(event),
             );
           }
         } catch (parseError) {
@@ -202,8 +213,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(
           and(
             eq(agentData.agentName, "expense_agent"),
-            sql`TRIM(${agentData.status}) = 'success'`
-          )
+            sql`TRIM(${agentData.status}) = 'success'`,
+          ),
         )
         .orderBy(desc(agentData.createdAt))
         .limit(1);
@@ -215,11 +226,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           // Handle case where agentResponse might already be parsed or is a string
           const response = latestRecord[0].agentResponse;
-          const parsed = typeof response === 'string' ? JSON.parse(response) : response;
-          
+          const parsed =
+            typeof response === "string" ? JSON.parse(response) : response;
+
           // Validate against schema
           const expenseData = expenseDataSchema.parse(parsed);
-          
+
           // Transform raw data into normalized items with details
           expenseItems = transformExpenseData(expenseData);
         } catch (parseError) {
@@ -245,8 +257,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(
           and(
             eq(agentData.agentName, "investment_agent"),
-            sql`TRIM(${agentData.status}) = 'success'`
-          )
+            sql`TRIM(${agentData.status}) = 'success\n'`,
+          ),
         )
         .orderBy(desc(agentData.createdAt))
         .limit(1);
@@ -258,8 +270,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           // Handle case where agentResponse might already be parsed or is a string
           const response = latestRecord[0].agentResponse;
-          const parsed = typeof response === 'string' ? JSON.parse(response) : response;
-          
+          const parsed =
+            typeof response === "string" ? JSON.parse(response) : response;
+
           // Validate against schema
           investmentData = investmentDataSchema.parse(parsed);
         } catch (parseError) {

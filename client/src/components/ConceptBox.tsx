@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat } from "lucide-react";
+import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat, FileSearch } from "lucide-react";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
@@ -21,6 +21,7 @@ export interface CalendarItem {
   summary: string;
   startTime: string;
   link?: string;
+  research?: string;
 }
 
 export interface ExpenseDetail {
@@ -264,6 +265,17 @@ export default function ConceptBox({
                       </a>
                     )}
                   </div>
+                  {item.research && item.research.trim() !== "" && (
+                    <div className="mt-2 flex items-start gap-2">
+                      <FileSearch className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                      <div 
+                        className="text-sm text-muted-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help"
+                        data-testid={`text-research-${index}`}
+                      >
+                        {item.research}
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : item.type === "investment" ? (
                 <div className="space-y-4">
