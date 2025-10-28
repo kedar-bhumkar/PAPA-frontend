@@ -40,7 +40,11 @@ A visually stunning React application designed to showcase events, calendar item
 - Optimized queries to retrieve the latest successful record for each data type.
 - JSON parsing from the `agent_response` column with robust error handling.
 - Display of events with date, location, name, and optional URLs.
-- Display of calendar items with formatted CST date/time and summary.
+- Display of calendar items with formatted CST date/time, summary, and optional research notes:
+  - **Research property**: Optional field that provides additional context about calendar events
+  - Displays with FileSearch icon when present
+  - Hover-to-expand functionality: Initially shows 2 lines, expands on hover to show full content
+  - Smooth 200ms transitions between truncated and expanded states
 - Comprehensive financial overview including salary, expenses, subscriptions, investments, and savings, with category-specific icons.
 - **Expandable expense categories** with detailed line-item breakdowns:
   - Click any expense category (except Salary) to expand and view detailed line items
