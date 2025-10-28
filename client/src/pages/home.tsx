@@ -59,6 +59,7 @@ export default function Home() {
         summary: calEvent.summary,
         startTime: calEvent.startTime,
         link: calEvent.link,
+        research: calEvent.research,
       })),
     });
   }
