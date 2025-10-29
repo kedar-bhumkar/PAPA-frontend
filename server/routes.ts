@@ -5,6 +5,7 @@ import {
   agentData,
   eventsResponseSchema,
   calendarEventSchema,
+  calendarEventsResponseSchema,
   expenseDataSchema,
   investmentDataSchema,
   type EventData,
@@ -176,7 +177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let allCalendarEvents: CalendarEventData[] = [];
 
       // Parse agent_response JSON from the latest record
-      // Note: calendar_agent response is directly an array, not wrapped
+      // Note: calendar_agent response is wrapped in an events object
       if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
         try {
           // Handle case where agentResponse might already be parsed or is a string
@@ -184,12 +185,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const parsed =
             typeof response === "string" ? JSON.parse(response) : response;
 
-          // Validate it's an array
-          if (Array.isArray(parsed)) {
-            allCalendarEvents = parsed.map((event) =>
-              calendarEventSchema.parse(event),
-            );
-          }
+          // Validate with the new schema that has events wrapper
+          const validated = calendarEventsResponseSchema.parse(parsed);
+          allCalendarEvents = validated.events;
         } catch (parseError) {
           console.error("Error parsing calendar agent_response:", parseError);
         }
