@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat, FileSearch } from "lucide-react";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
 
@@ -72,13 +72,24 @@ export interface ConceptBoxProps {
 }
 
 // Helper function to format calendar date/time in CST
-function formatCalendarTime(isoString: string): string {
+function formatCalendarTime(dateString: string): string {
   try {
-    const date = new Date(isoString);
+    // Try parsing the new format: "2025-10-29 10:00 am"
+    let date: Date;
+    
+    // Check if it's the new format (contains space and am/pm)
+    if (dateString.includes(' am') || dateString.includes(' pm')) {
+      // Parse format: "2025-10-29 10:00 am"
+      date = parse(dateString, "yyyy-MM-dd h:mm a", new Date());
+    } else {
+      // Fall back to ISO format or native Date parsing
+      date = new Date(dateString);
+    }
+    
     const cstDate = toZonedTime(date, "America/Chicago");
     return format(cstDate, "MMM d, yyyy • h:mm a 'CST'");
   } catch {
-    return isoString;
+    return dateString;
   }
 }
 
