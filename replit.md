@@ -34,6 +34,9 @@ A visually stunning React application designed to showcase events, calendar item
 - **Server**: Express.js
 - **Database**: Supabase (PostgreSQL)
 - **ORM**: Drizzle ORM with postgres-js driver
+- **Data Format**: 
+  - Events and Calendar agents return data wrapped in `{events: [...]}` structure
+  - Calendar date format: "2025-10-29 10:00 am" (parsed with backwards compatibility for ISO format)
 
 ### Features
 - Real-time data fetching for events, calendar, expenses, and investments.
