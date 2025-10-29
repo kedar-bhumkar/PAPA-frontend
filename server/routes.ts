@@ -123,17 +123,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get events from the latest successful event_agent record
   app.get("/api/events", async (req, res) => {
     try {
+      const userId = req.query.userId as string;
+      
+      // Build where conditions
+      const conditions = [
+        eq(agentData.agentName, "event_agent"),
+        sql`TRIM(${agentData.status}) = 'success'`,
+      ];
+      
+      if (userId) {
+        conditions.push(eq(agentData.userId, userId));
+      }
+      
       // Select the latest successful record where agent_name='event_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db
         .select()
         .from(agentData)
-        .where(
-          and(
-            eq(agentData.agentName, "event_agent"),
-            sql`TRIM(${agentData.status}) = 'success'`,
-          ),
-        )
+        .where(and(...conditions))
         .orderBy(desc(agentData.createdAt))
         .limit(1);
 
@@ -160,17 +167,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get calendar events from the latest successful calendar_agent record
   app.get("/api/calendar", async (req, res) => {
     try {
+      const userId = req.query.userId as string;
+      
+      // Build where conditions
+      const conditions = [
+        eq(agentData.agentName, "calendar_agent"),
+        sql`TRIM(${agentData.status}) = 'success'`,
+      ];
+      
+      if (userId) {
+        conditions.push(eq(agentData.userId, userId));
+      }
+      
       // Select the latest successful record where agent_name='calendar_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db
         .select()
         .from(agentData)
-        .where(
-          and(
-            eq(agentData.agentName, "calendar_agent"),
-            sql`TRIM(${agentData.status}) = 'success'`,
-          ),
-        )
+        .where(and(...conditions))
         .orderBy(desc(agentData.createdAt))
         .limit(1);
 
@@ -203,17 +217,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get expense data from the latest successful expense_agent record
   app.get("/api/expenses", async (req, res) => {
     try {
+      const userId = req.query.userId as string;
+      
+      // Build where conditions
+      const conditions = [
+        eq(agentData.agentName, "expense_agent"),
+        sql`TRIM(${agentData.status}) = 'success'`,
+      ];
+      
+      if (userId) {
+        conditions.push(eq(agentData.userId, userId));
+      }
+      
       // Select the latest successful record where agent_name='expense_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db
         .select()
         .from(agentData)
-        .where(
-          and(
-            eq(agentData.agentName, "expense_agent"),
-            sql`TRIM(${agentData.status}) = 'success'`,
-          ),
-        )
+        .where(and(...conditions))
         .orderBy(desc(agentData.createdAt))
         .limit(1);
 
@@ -247,17 +268,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get investment data from the latest successful investment_agent record
   app.get("/api/investments", async (req, res) => {
     try {
+      const userId = req.query.userId as string;
+      
+      // Build where conditions
+      const conditions = [
+        eq(agentData.agentName, "investment_agent"),
+        sql`TRIM(${agentData.status}) = 'success\n'`,
+      ];
+      
+      if (userId) {
+        conditions.push(eq(agentData.userId, userId));
+      }
+      
       // Select the latest successful record where agent_name='investment_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db
         .select()
         .from(agentData)
-        .where(
-          and(
-            eq(agentData.agentName, "investment_agent"),
-            sql`TRIM(${agentData.status}) = 'success\n'`,
-          ),
-        )
+        .where(and(...conditions))
         .orderBy(desc(agentData.createdAt))
         .limit(1);
 

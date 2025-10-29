@@ -25,6 +25,7 @@ export const agentData = pgTable("agent_output", {
   agentName: text("agent_name"),
   agentResponse: text("agent_response"),
   status: text("status"),
+  userId: text("user_id"),
 });
 
 export type AgentData = typeof agentData.$inferSelect;
