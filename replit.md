@@ -37,6 +37,10 @@ A visually stunning React application designed to showcase events, calendar item
 - **Data Format**: 
   - Events and Calendar agents return data wrapped in `{events: [...]}` structure
   - Calendar date format: "2025-10-29 10:00 am" (parsed with backwards compatibility for ISO format)
+- **User Filtering**: 
+  - All API endpoints accept optional `userId` query parameter (e.g., `?userId=demo`)
+  - Filters `agent_output` table by `user_id` column when provided
+  - Backward compatible - works without userId parameter
 
 ### Features
 - Real-time data fetching for events, calendar, expenses, and investments.
