@@ -10,20 +10,52 @@ import expensesBg from "@assets/generated_images/Expenses_card_gradient_backgrou
 import investmentBg from "@assets/generated_images/Investment_card_gradient_background_8a3e8035.png";
 
 export default function Home() {
+  // Get userId from URL query parameters
+  const searchParams = new URLSearchParams(window.location.search);
+  const userId = searchParams.get('userId');
+  
+  // Build query URL with userId parameter if present
+  const buildQueryUrl = (endpoint: string) => {
+    if (userId) {
+      return `${endpoint}?userId=${encodeURIComponent(userId)}`;
+    }
+    return endpoint;
+  };
+
   const { data: events, isLoading: eventsLoading } = useQuery<EventData[]>({
-    queryKey: ["/api/events"],
+    queryKey: ["/api/events", userId],
+    queryFn: async () => {
+      const response = await fetch(buildQueryUrl("/api/events"));
+      if (!response.ok) throw new Error("Failed to fetch events");
+      return response.json();
+    },
   });
 
   const { data: calendarEvents, isLoading: calendarLoading } = useQuery<CalendarEventData[]>({
-    queryKey: ["/api/calendar"],
+    queryKey: ["/api/calendar", userId],
+    queryFn: async () => {
+      const response = await fetch(buildQueryUrl("/api/calendar"));
+      if (!response.ok) throw new Error("Failed to fetch calendar");
+      return response.json();
+    },
   });
 
   const { data: expenseItems, isLoading: expensesLoading } = useQuery<ExpenseItem[]>({
-    queryKey: ["/api/expenses"],
+    queryKey: ["/api/expenses", userId],
+    queryFn: async () => {
+      const response = await fetch(buildQueryUrl("/api/expenses"));
+      if (!response.ok) throw new Error("Failed to fetch expenses");
+      return response.json();
+    },
   });
 
   const { data: investmentData, isLoading: investmentsLoading } = useQuery<InvestmentData>({
-    queryKey: ["/api/investments"],
+    queryKey: ["/api/investments", userId],
+    queryFn: async () => {
+      const response = await fetch(buildQueryUrl("/api/investments"));
+      if (!response.ok) throw new Error("Failed to fetch investments");
+      return response.json();
+    },
   });
 
   const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading;
