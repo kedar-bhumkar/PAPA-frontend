@@ -273,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "investment_agent"),
-        sql`TRIM(${agentData.status}) = 'success\n'`,
+        sql`TRIM(${agentData.status}) = 'success'`,
       ];
       
       if (userId) {
