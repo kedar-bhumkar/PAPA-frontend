@@ -124,17 +124,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/events", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      
+
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "event_agent"),
-        sql`TRIM(${agentData.status}) = 'success'`,
+        sql`${agentData.status} = E'success\n'`, // E'' ensures real newline
       ];
-      
+
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
       }
-      
+
       // Select the latest successful record where agent_name='event_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db
@@ -168,17 +168,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/calendar", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      
+
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "calendar_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
       ];
-      
+
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
       }
-      
+
       // Select the latest successful record where agent_name='calendar_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db
@@ -218,17 +218,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/expenses", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      
+
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "expense_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
       ];
-      
+
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
       }
-      
+
       // Select the latest successful record where agent_name='expense_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db
@@ -269,17 +269,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/investments", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      
+
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "investment_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
       ];
-      
+
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
       }
-      
+
       // Select the latest successful record where agent_name='investment_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
       const latestRecord = await db

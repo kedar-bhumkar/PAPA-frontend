@@ -5,7 +5,9 @@ import { z } from "zod";
 
 // Users table (existing)
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
@@ -59,7 +61,9 @@ export const calendarEventsResponseSchema = z.object({
 });
 
 export type CalendarEventData = z.infer<typeof calendarEventSchema>;
-export type CalendarEventsResponse = z.infer<typeof calendarEventsResponseSchema>;
+export type CalendarEventsResponse = z.infer<
+  typeof calendarEventsResponseSchema
+>;
 
 // Expense data structure (parsed from JSON)
 export const expenseDataSchema = z.object({
@@ -67,10 +71,12 @@ export const expenseDataSchema = z.object({
   expenses: z.record(z.number()).optional(),
   subscriptions: z.record(z.number()).optional(),
   investments: z.record(z.number()).optional(),
-  savings: z.object({
-    net: z.number().optional(),
-    in_hand: z.number().optional(),
-  }).optional(),
+  savings: z
+    .object({
+      net: z.number().optional(),
+      in_hand: z.number().optional(),
+    })
+    .optional(),
 });
 
 export type ExpenseData = z.infer<typeof expenseDataSchema>;
@@ -87,7 +93,13 @@ export type ExpenseDetail = z.infer<typeof expenseDetailSchema>;
 export const expenseItemSchema = z.object({
   category: z.string(),
   amount: z.number(),
-  icon: z.enum(["salary", "expenses", "subscriptions", "investments", "savings"]),
+  icon: z.enum([
+    "salary",
+    "expenses",
+    "subscriptions",
+    "investments",
+    "savings",
+  ]),
   details: z.array(expenseDetailSchema).optional(),
 });
 
@@ -113,10 +125,12 @@ export const investmentDataSchema = z.object({
     us_investments: z.string(),
     india_investments: z.string(),
   }),
-  advice: z.object({
-    us_investments: z.string(),
-    india_investments: z.string(),
-  }).optional(),
+  advice: z
+    .object({
+      us_investments: z.string(),
+      india_investments: z.string(),
+    })
+    .optional(),
 });
 
 export type InvestmentData = z.infer<typeof investmentDataSchema>;
