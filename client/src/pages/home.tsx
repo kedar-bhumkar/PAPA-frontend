@@ -8,6 +8,12 @@ import eventBg1 from "@assets/generated_images/Event_card_gradient_background_8c
 import calendarBg from "@assets/generated_images/Calendar_card_gradient_background_f49550e0.png";
 import expensesBg from "@assets/generated_images/Expenses_card_gradient_background_dd3e9188.png";
 import investmentBg from "@assets/generated_images/Investment_card_gradient_background_8a3e8035.png";
+import researchBg from "@assets/generated_images/Research_card_gradient_background_b8c29afa.png";
+
+interface ResearchItem {
+  task: string;
+  result: string;
+}
 
 export default function Home() {
   // Get userId from URL query parameters
@@ -58,7 +64,16 @@ export default function Home() {
     },
   });
 
-  const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading;
+  const { data: researchItems, isLoading: researchLoading } = useQuery<ResearchItem[]>({
+    queryKey: ["/api/research", userId],
+    queryFn: async () => {
+      const response = await fetch(buildQueryUrl("/api/research"));
+      if (!response.ok) throw new Error("Failed to fetch research");
+      return response.json();
+    },
+  });
+
+  const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading || researchLoading;
 
   const concepts: ConceptBoxProps[] = [];
 
@@ -92,6 +107,21 @@ export default function Home() {
         startTime: calEvent.startTime,
         link: calEvent.link,
         research: calEvent.research,
+      })),
+    });
+  }
+
+  // Add Research card if we have research items
+  if (researchItems && researchItems.length > 0) {
+    concepts.push({
+      title: "Research Insights",
+      category: "Research",
+      imageUrl: researchBg,
+      categoryColor: "bg-purple-500/20",
+      items: researchItems.map((researchItem) => ({
+        type: "research" as const,
+        task: researchItem.task,
+        result: researchItem.result,
       })),
     });
   }
