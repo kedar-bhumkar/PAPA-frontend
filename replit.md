@@ -1,7 +1,7 @@
-# PAPA - Events, Calendar, Expenses & Investments Showcase Application
+# PAPA - Events, Calendar, Research, Expenses & Investments Showcase Application
 
 ## Overview
-A visually stunning React application designed to showcase events, calendar items, financial expenses, and investment portfolios. It fetches data from a Supabase database and presents it in an animated carousel interface. The application features a modern design with dark/light theme support, smooth animations, and a distinctive gradient title, aiming to provide a clear and engaging overview of personal data.
+A visually stunning React application designed to showcase events, calendar items, research insights, financial expenses, and investment portfolios. It fetches data from a Supabase database and presents it in an animated carousel interface. The application features a modern design with dark/light theme support, smooth animations, and a distinctive gradient title, aiming to provide a clear and engaging overview of personal data.
 
 ## User Preferences
 - Keep the fonts (Inter and Manrope)
@@ -9,6 +9,7 @@ A visually stunning React application designed to showcase events, calendar item
 - Header title displays "PAPA" with gradient effect
 - Events displayed in grouped format: date, location, event name
 - Calendar items displayed with formatted CST time and summary
+- Research items displayed with task and truncated result, hover to expand full result text
 - Expenses displayed with category icons and formatted currency amounts
 - Investment portfolio displayed with US and India projected balances with appropriate icons
 - Full-height cards utilizing available vertical space (calc(100vh - 200px))
@@ -43,7 +44,7 @@ A visually stunning React application designed to showcase events, calendar item
   - Backward compatible - works without userId parameter
 
 ### Features
-- Real-time data fetching for events, calendar, expenses, and investments.
+- Real-time data fetching for events, calendar, research, expenses, and investments.
 - Optimized queries to retrieve the latest successful record for each data type.
 - JSON parsing from the `agent_response` column with robust error handling.
 - Display of events with date, location, name, and optional URLs.
@@ -52,6 +53,13 @@ A visually stunning React application designed to showcase events, calendar item
   - Displays with FileSearch icon when present
   - Hover-to-expand functionality: Initially shows 2 lines, expands on hover to show full content
   - Smooth 200ms transitions between truncated and expanded states
+- Display of research items with task and result:
+  - **Research card**: Displays research agent insights from `research_agent`
+  - JSON structure: `[{"task":"", "result": ""},...]`
+  - Shows task title prominently with truncated result preview (2 lines)
+  - Hover-to-expand functionality: Expands on hover to show full result text
+  - Smooth 200ms transitions between truncated and expanded states
+  - Purple gradient background (bg-purple-500/20)
 - Comprehensive financial overview including salary, expenses, subscriptions, investments, and savings, with category-specific icons.
 - **Expandable expense categories** with detailed line-item breakdowns:
   - Click any expense category (except Salary) to expand and view detailed line items
@@ -82,7 +90,7 @@ A visually stunning React application designed to showcase events, calendar item
 - Clickable external links that open in new tabs.
 - Automatic CST timezone conversion for calendar events.
 - Type-safe discriminated unions for robust data handling.
-- Visually distinct cards for events (purple-pink), calendar (blue-teal-cyan), expenses (amber-green), and investments (emerald-teal).
+- Visually distinct cards for events (purple-pink), calendar (blue-teal-cyan), research (purple-violet-pink), expenses (amber-green), and investments (emerald-teal).
 
 ## External Dependencies
 - **Supabase**: Used as the PostgreSQL database backend.
