@@ -313,6 +313,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get research data from the latest successful research_agent record
+  app.get("/api/research", async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      
+      // Build where conditions
+      const conditions = [
+        eq(agentData.agentName, "research_agent"),
+        sql`TRIM(${agentData.status}) = 'success'`,
+      ];
+      
+      if (userId) {
+        conditions.push(eq(agentData.userId, userId));
+      }
+
+      // Select the latest successful record where agent_name='research_agent', LIMIT 1
+      const latestRecord = await db
+        .select()
+        .from(agentData)
+        .where(and(...conditions))
+        .orderBy(desc(agentData.createdAt))
+        .limit(1);
+
+      let researchItems: Array<{ task: string; result: string }> = [];
+
+      // Parse agent_response JSON from the latest record
+      if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        try {
+          // Handle case where agentResponse might already be parsed or is a string
+          const response = latestRecord[0].agentResponse;
+          const parsed =
+            typeof response === "string" ? JSON.parse(response) : response;
+
+          // Validate it's an array
+          if (Array.isArray(parsed)) {
+            researchItems = parsed;
+          }
+        } catch (parseError) {
+          console.error("Error parsing research agent_response:", parseError);
+        }
+      }
+
+      res.json(researchItems);
+    } catch (error) {
+      console.error("Error fetching research:", error);
+      res.status(500).json({ error: "Failed to fetch research" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

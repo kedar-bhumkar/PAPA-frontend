@@ -6,7 +6,7 @@ import { format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
 
-export type ConceptItem = EventItem | CalendarItem | ExpenseItem | InvestmentItem;
+export type ConceptItem = EventItem | CalendarItem | ExpenseItem | InvestmentItem | ResearchItem;
 
 export interface EventItem {
   type: "event";
@@ -22,6 +22,12 @@ export interface CalendarItem {
   startTime: string;
   link?: string;
   research?: string;
+}
+
+export interface ResearchItem {
+  type: "research";
+  task: string;
+  result: string;
 }
 
 export interface ExpenseDetail {
@@ -287,6 +293,18 @@ export default function ConceptBox({
                       </div>
                     </div>
                   )}
+                </>
+              ) : item.type === "research" ? (
+                <>
+                  <div className="text-base font-semibold text-card-foreground mb-2">
+                    {item.task}
+                  </div>
+                  <div 
+                    className="text-sm text-muted-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help"
+                    data-testid={`text-result-${index}`}
+                  >
+                    {item.result}
+                  </div>
                 </>
               ) : item.type === "investment" ? (
                 <div className="space-y-4">
