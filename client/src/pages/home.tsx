@@ -3,17 +3,12 @@ import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
-import { type EventData, type CalendarEventData, type ExpenseItem, type InvestmentData } from "@shared/schema";
+import { type EventData, type CalendarEventData, type ExpenseItem, type InvestmentData, type ResearchItem } from "@shared/schema";
 import eventBg1 from "@assets/generated_images/Event_card_gradient_background_8c68dd6e.png";
 import calendarBg from "@assets/generated_images/Calendar_card_gradient_background_f49550e0.png";
 import expensesBg from "@assets/generated_images/Expenses_card_gradient_background_dd3e9188.png";
 import investmentBg from "@assets/generated_images/Investment_card_gradient_background_8a3e8035.png";
 import researchBg from "@assets/generated_images/Research_card_gradient_background_b8c29afa.png";
-
-interface ResearchItem {
-  task: string;
-  result: string;
-}
 
 export default function Home() {
   // Get userId from URL query parameters

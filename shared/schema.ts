@@ -134,3 +134,16 @@ export const investmentDataSchema = z.object({
 });
 
 export type InvestmentData = z.infer<typeof investmentDataSchema>;
+
+// Research data structure (parsed from JSON)
+export const researchItemSchema = z.object({
+  task: z.string(),
+  result: z.string(),
+});
+
+export const researchResponseSchema = z.object({
+  tasks: z.array(researchItemSchema),
+});
+
+export type ResearchItem = z.infer<typeof researchItemSchema>;
+export type ResearchResponse = z.infer<typeof researchResponseSchema>;

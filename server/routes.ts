@@ -8,6 +8,7 @@ import {
   calendarEventsResponseSchema,
   expenseDataSchema,
   investmentDataSchema,
+  researchResponseSchema,
   type EventData,
   type CalendarEventData,
   type ExpenseData,
@@ -346,10 +347,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const parsed =
             typeof response === "string" ? JSON.parse(response) : response;
 
-          // Validate it's an array
-          if (Array.isArray(parsed)) {
-            researchItems = parsed;
-          }
+          // Validate against schema
+          const researchData = researchResponseSchema.parse(parsed);
+          researchItems = researchData.tasks;
         } catch (parseError) {
           console.error("Error parsing research agent_response:", parseError);
         }
