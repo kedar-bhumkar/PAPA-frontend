@@ -347,9 +347,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const parsed =
             typeof response === "string" ? JSON.parse(response) : response;
 
-          // Validate against schema
-          const researchData = researchResponseSchema.parse(parsed);
-          researchItems = researchData.tasks;
+          // Handle both new format {"tasks": [...]} and legacy format [...]
+          if (Array.isArray(parsed)) {
+            // Legacy format: plain array
+            console.log("Research agent response using legacy array format");
+            researchItems = parsed;
+          } else {
+            // New format: wrapped in tasks object
+            const researchData = researchResponseSchema.parse(parsed);
+            researchItems = researchData.tasks;
+          }
         } catch (parseError) {
           console.error("Error parsing research agent_response:", parseError);
         }

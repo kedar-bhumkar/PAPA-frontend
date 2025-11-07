@@ -55,11 +55,13 @@ A visually stunning React application designed to showcase events, calendar item
   - Smooth 200ms transitions between truncated and expanded states
 - Display of research items with task and result:
   - **Research card**: Displays research agent insights from `research_agent`
-  - JSON structure: `[{"task":"", "result": ""},...]`
+  - JSON structure (new format): `{"tasks": [{"task":"", "result": ""}]}`
+  - Backward compatible with legacy format: `[{"task":"", "result": ""}]`
   - Shows task title prominently with truncated result preview (2 lines)
   - Hover-to-expand functionality: Expands on hover to show full result text
   - Smooth 200ms transitions between truncated and expanded states
   - Purple gradient background (bg-purple-500/20)
+  - Zod schema validation for data integrity
 - Comprehensive financial overview including salary, expenses, subscriptions, investments, and savings, with category-specific icons.
 - **Expandable expense categories** with detailed line-item breakdowns:
   - Click any expense category (except Salary) to expand and view detailed line items
