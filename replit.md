@@ -67,8 +67,14 @@ A visually stunning React application designed to showcase events, calendar item
     - **Visual styling matches card design**: Purple gradient background (`bg-gradient-to-br from-purple-500/10 via-card to-card`), backdrop blur effects, and card-style borders
     - **Sticky header**: Research badge and title remain at top while scrolling
     - **Content container**: Rounded container with `bg-card/30` and `backdrop-blur-sm` matching card item styling
+    - **Enhanced text formatting** via FormattedResearchContent component:
+      - Detects and formats section headings (ending with colons, numbered, etc.) as bold with larger text
+      - Automatically splits long continuous text into readable paragraphs (2-3 sentences each)
+      - Renders bullet points with colored markers and indentation
+      - Proper spacing between sections and paragraphs for improved readability
+      - Works for both structured text with headings and unstructured continuous text
     - Displays full research task as prominent title and complete result text
-    - Well-formatted content with whitespace preservation and hidden scrollbars
+    - Well-formatted content with hidden scrollbars
     - Closes via ESC key, backdrop click, or close button
   - Smooth 200ms transitions between truncated and expanded states
   - Purple gradient background (bg-purple-500/20)
