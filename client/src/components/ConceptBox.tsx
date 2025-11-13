@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat, FileSearch } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat, FileSearch, Maximize2 } from "lucide-react";
 import { format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
@@ -203,7 +204,10 @@ export default function ConceptBox({
   createdAt,
 }: ConceptBoxProps) {
   const lastFetched = formatLastFetched(createdAt);
+  const [selectedResearch, setSelectedResearch] = useState<ResearchItem | null>(null);
+  
   return (
+    <>
     <Card
       className="group relative h-[calc(100vh-200px)] w-[380px] flex-shrink-0 overflow-hidden border-card-border hover-elevate active-elevate-2 transition-all duration-300"
       data-testid={`card-concept-${title.toLowerCase().replace(/\s+/g, '-')}`}
@@ -317,14 +321,26 @@ export default function ConceptBox({
                 </>
               ) : item.type === "research" ? (
                 <>
-                  <div className="text-base font-semibold text-card-foreground mb-2">
-                    {item.task}
-                  </div>
-                  <div 
-                    className="text-sm text-muted-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help"
-                    data-testid={`text-result-${index}`}
-                  >
-                    {item.result}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <div className="text-base font-semibold text-card-foreground mb-2">
+                        {item.task}
+                      </div>
+                      <div 
+                        className="text-sm text-muted-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help"
+                        data-testid={`text-result-${index}`}
+                      >
+                        {item.result}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedResearch(item)}
+                      className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors p-1"
+                      data-testid={`button-expand-research-${index}`}
+                      aria-label="View full research details"
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </>
               ) : item.type === "investment" ? (
@@ -466,5 +482,26 @@ export default function ConceptBox({
         }
       `}</style>
     </Card>
+
+    {/* Research Details Dialog */}
+    <Dialog open={!!selectedResearch} onOpenChange={(open) => !open && setSelectedResearch(null)}>
+      <DialogContent className="w-[80vw] h-[80vh] max-w-[80vw] sm:w-[80vw] sm:max-w-[80vw] overflow-y-auto" data-testid="dialog-research-details">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-card-foreground pr-8" data-testid="text-dialog-title">
+            {selectedResearch?.task}
+          </DialogTitle>
+        </DialogHeader>
+        <DialogDescription asChild>
+          <div className="mt-4">
+            <div className="prose prose-sm dark:prose-invert max-w-none">
+              <div className="text-base leading-relaxed text-card-foreground whitespace-pre-wrap" data-testid="text-dialog-result">
+                {selectedResearch?.result}
+              </div>
+            </div>
+          </div>
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
