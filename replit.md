@@ -24,9 +24,9 @@ A visually stunning React application designed to showcase events, calendar item
 - **Data Fetching**: TanStack Query
 - **Styling**: Tailwind CSS with Shadcn/ui components
 - **Fonts**: Inter and Manrope
-- **UI/UX**: Dark/light theme, gradient title, smooth animations, responsive design, shimmer loading skeletons, dual navigation arrows (positioned at both top and bottom, side by side, show/hide based on scroll state), horizontal-only scrolling with full-height cards (calc(100vh - 200px)).
+- **UI/UX**: Dark/light theme, gradient title, smooth animations, responsive design, shimmer loading skeletons, dual navigation arrows (positioned at both top and bottom, side by side, show/hide based on scroll state), horizontal-only scrolling with full-height cards (calc(100vh - 200px)), "Last fetched" timestamp display on each card.
 - **Core Components**:
-    - `ConceptBox`: Displays events, calendar items, expenses, and investments with type discrimination and unique gradient backgrounds. Full-height cards (calc(100vh - 200px)) with overflow-y-auto and CSS-hidden scrollbars (maintains scrolling functionality while appearing scrollbar-free).
+    - `ConceptBox`: Displays events, calendar items, expenses, and investments with type discrimination and unique gradient backgrounds. Full-height cards (calc(100vh - 200px)) with overflow-y-auto and CSS-hidden scrollbars (maintains scrolling functionality while appearing scrollbar-free). **"Last fetched:" timestamp** displayed in top RHS of each card, formatted in CST timezone with am/pm (e.g., "Nov 13, 2025 • 3:32 pm").
     - `ExpenseItemComponent`: Handles expandable/collapsible expense categories with independent state and smooth animations.
     - `ConceptCarousel`: Manages horizontal scrolling with dual navigation arrows at top and bottom positions. Each position has left and right arrows side by side, centered horizontally. Arrows intelligently appear/disappear based on scroll state using opacity transitions.
     - `ThemeToggle`: For dark/light mode switching.
@@ -35,6 +35,9 @@ A visually stunning React application designed to showcase events, calendar item
 - **Server**: Express.js
 - **Database**: Supabase (PostgreSQL)
 - **ORM**: Drizzle ORM with postgres-js driver
+- **API Response Structure**: All endpoints return `{ data: T, createdAt: Date | null }`
+  - `data`: The actual content (events, calendar items, expenses, etc.)
+  - `createdAt`: Timestamp from `agent_output.created_at` field for "Last fetched" display
 - **Data Format**: 
   - Events and Calendar agents return data wrapped in `{events: [...]}` structure
   - Calendar date format: "2025-10-29 10:00 am" (parsed with backwards compatibility for ISO format)
