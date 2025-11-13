@@ -433,12 +433,12 @@ export default function ConceptBox({
               ) : item.type === "research" ? (
                 <>
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="text-base font-semibold text-card-foreground mb-2">
                         {item.task}
                       </div>
                       <div 
-                        className="text-sm text-muted-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help"
+                        className="text-sm text-muted-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help pr-2"
                         data-testid={`text-result-${index}`}
                       >
                         {item.result}
@@ -446,7 +446,7 @@ export default function ConceptBox({
                     </div>
                     <button
                       onClick={() => setSelectedResearch(item)}
-                      className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors p-1"
+                      className="relative z-10 flex-shrink-0 text-primary hover:text-primary/80 transition-colors p-1"
                       data-testid={`button-expand-research-${index}`}
                       aria-label="View full research details"
                     >
