@@ -113,6 +113,102 @@ function formatLastFetched(dateString: string | null | undefined): string {
   }
 }
 
+// Component to render formatted research text with headings, lists, and spacing
+function FormattedResearchContent({ text }: { text: string }) {
+  // First, try to intelligently split continuous text by section markers
+  let processedText = text;
+  
+  // Add line breaks before various section heading patterns:
+  // 1. ". - Word:" or ". - Phrase:" (with hyphen)
+  processedText = processedText.replace(/\.\s+-\s+([A-Z][^:]+:)/g, '.\n\n$1');
+  
+  // 2. ". Word (Details):" (with parenthetical)
+  processedText = processedText.replace(/\.\s+([A-Z][a-z\s]+\([^)]+\):)/g, '.\n\n$1');
+  
+  // 3. ". Word:" or ". Phrase:" (general case - most common)
+  processedText = processedText.replace(/\.\s+([A-Z][a-z][a-z\s]+:)/g, '.\n\n$1');
+  
+  // 4. Start of text with "Word:" or "Phrase:"
+  processedText = processedText.replace(/^([A-Z][a-z][a-z\s]+:)/gm, '\n$1');
+  
+  // 5. For long continuous text without headings, create paragraph breaks
+  // Split into sentences and group every 2-3 sentences into a paragraph
+  if (!processedText.includes('\n') && processedText.length > 300) {
+    const sentences = processedText.match(/[^.!?]+[.!?]+/g) || [processedText];
+    const paragraphs: string[] = [];
+    for (let i = 0; i < sentences.length; i += 3) {
+      const para = sentences.slice(i, i + 3).join(' ').trim();
+      paragraphs.push(para);
+    }
+    processedText = paragraphs.join('\n\n');
+  }
+  
+  const lines = processedText.split('\n');
+  const elements: JSX.Element[] = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+    
+    // Skip empty lines (we'll add them as spacing)
+    if (trimmedLine === '') {
+      elements.push(<div key={`empty-${i}`} className="h-4" />);
+      continue;
+    }
+    
+    // Check if line is a heading - expanded patterns
+    const isHeading = 
+      trimmedLine.endsWith(':') || 
+      /^\d+\./.test(trimmedLine) ||
+      /^-\s+[A-Z]/.test(trimmedLine) || // Starts with "- Capital"
+      /^[A-Z][a-z\s]+\([^)]+\):/.test(trimmedLine) || // "Word (Details):"
+      (/^[A-Z\s]+:?$/.test(trimmedLine) && trimmedLine.length < 50);
+    
+    // Check if line is a bullet point
+    const isBullet = /^[-•*]\s/.test(trimmedLine) && !isHeading;
+    
+    if (isHeading) {
+      elements.push(
+        <div key={i} className="font-bold text-card-foreground mt-4 mb-2 text-lg">
+          {trimmedLine}
+        </div>
+      );
+    } else if (isBullet) {
+      elements.push(
+        <div key={i} className="flex gap-2 mb-2 ml-4">
+          <span className="text-primary flex-shrink-0">•</span>
+          <span className="text-card-foreground">{trimmedLine.replace(/^[-•*]\s/, '')}</span>
+        </div>
+      );
+    } else {
+      // For long paragraphs, look for inline section headers and split them
+      const parts = trimmedLine.split(/(?<=\.\s)(?=[A-Z][a-z\s]+\([^)]+\):)/);
+      
+      parts.forEach((part, partIdx) => {
+        const trimmedPart = part.trim();
+        if (!trimmedPart) return;
+        
+        // Check if this part is a heading pattern
+        if (/^[A-Z][a-z\s]+\([^)]+\):/.test(trimmedPart)) {
+          elements.push(
+            <div key={`${i}-${partIdx}-heading`} className="font-bold text-card-foreground mt-4 mb-2 text-lg">
+              {trimmedPart}
+            </div>
+          );
+        } else {
+          elements.push(
+            <p key={`${i}-${partIdx}`} className="text-card-foreground mb-3 leading-relaxed">
+              {trimmedPart}
+            </p>
+          );
+        }
+      });
+    }
+  }
+  
+  return <>{elements}</>;
+}
+
 // Expense Item Component with expand/collapse functionality
 function ExpenseItemComponent({ item, index }: { item: ExpenseItem; index: number }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -502,10 +598,10 @@ export default function ConceptBox({
           </DialogHeader>
           <DialogDescription asChild>
             <div className="mt-6 pb-4">
-              <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm">
-                <div className="text-base leading-relaxed text-card-foreground whitespace-pre-wrap" data-testid="text-dialog-result">
-                  {selectedResearch?.result}
-                </div>
+              <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-result">
+                {selectedResearch?.result && (
+                  <FormattedResearchContent text={selectedResearch.result} />
+                )}
               </div>
             </div>
           </DialogDescription>
