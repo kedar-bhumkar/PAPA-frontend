@@ -146,9 +146,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
 
       let allEvents: EventData[] = [];
+      let createdAt: Date | null = null;
 
       // Parse agent_response JSON from the latest record
       if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        createdAt = latestRecord[0].createdAt;
         try {
           const parsed = JSON.parse(latestRecord[0].agentResponse);
           const validated = eventsResponseSchema.parse(parsed);
@@ -158,7 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json(allEvents);
+      res.json({ data: allEvents, createdAt });
     } catch (error) {
       console.error("Error fetching events:", error);
       res.status(500).json({ error: "Failed to fetch events" });
@@ -190,10 +192,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
 
       let allCalendarEvents: CalendarEventData[] = [];
+      let createdAt: Date | null = null;
 
       // Parse agent_response JSON from the latest record
       // Note: calendar_agent response is wrapped in an events object
       if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        createdAt = latestRecord[0].createdAt;
         try {
           // Handle case where agentResponse might already be parsed or is a string
           const response = latestRecord[0].agentResponse;
@@ -208,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json(allCalendarEvents);
+      res.json({ data: allCalendarEvents, createdAt });
     } catch (error) {
       console.error("Error fetching calendar events:", error);
       res.status(500).json({ error: "Failed to fetch calendar events" });
@@ -240,9 +244,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
 
       let expenseItems: ExpenseItem[] = [];
+      let createdAt: Date | null = null;
 
       // Parse agent_response JSON from the latest record
       if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        createdAt = latestRecord[0].createdAt;
         try {
           // Handle case where agentResponse might already be parsed or is a string
           const response = latestRecord[0].agentResponse;
@@ -259,7 +265,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json(expenseItems);
+      res.json({ data: expenseItems, createdAt });
     } catch (error) {
       console.error("Error fetching expenses:", error);
       res.status(500).json({ error: "Failed to fetch expenses" });
@@ -291,9 +297,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
 
       let investmentData: InvestmentData | null = null;
+      let createdAt: Date | null = null;
 
       // Parse agent_response JSON from the latest record
       if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        createdAt = latestRecord[0].createdAt;
         try {
           // Handle case where agentResponse might already be parsed or is a string
           const response = latestRecord[0].agentResponse;
@@ -307,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json(investmentData);
+      res.json({ data: investmentData, createdAt });
     } catch (error) {
       console.error("Error fetching investments:", error);
       res.status(500).json({ error: "Failed to fetch investments" });
@@ -338,9 +346,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
 
       let researchItems: Array<{ task: string; result: string }> = [];
+      let createdAt: Date | null = null;
 
       // Parse agent_response JSON from the latest record
       if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        createdAt = latestRecord[0].createdAt;
         try {
           // Handle case where agentResponse might already be parsed or is a string
           const response = latestRecord[0].agentResponse;
@@ -362,7 +372,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json(researchItems);
+      res.json({ data: researchItems, createdAt });
     } catch (error) {
       console.error("Error fetching research:", error);
       res.status(500).json({ error: "Failed to fetch research" });

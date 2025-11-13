@@ -75,6 +75,7 @@ export interface ConceptBoxProps {
   items: ConceptItem[];
   imageUrl?: string;
   categoryColor?: string;
+  createdAt?: string | null;
 }
 
 // Helper function to format calendar date/time in CST
@@ -96,6 +97,18 @@ function formatCalendarTime(dateString: string): string {
     return format(cstDate, "MMM d, yyyy • h:mm a 'CST'");
   } catch {
     return dateString;
+  }
+}
+
+// Helper function to format "Last fetched" timestamp in CST
+function formatLastFetched(dateString: string | null | undefined): string {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    const cstDate = toZonedTime(date, "America/Chicago");
+    return format(cstDate, "MMM d, yyyy • h:mm a");
+  } catch {
+    return "";
   }
 }
 
@@ -187,7 +200,9 @@ export default function ConceptBox({
   items,
   imageUrl,
   categoryColor = "bg-primary/20",
+  createdAt,
 }: ConceptBoxProps) {
+  const lastFetched = formatLastFetched(createdAt);
   return (
     <Card
       className="group relative h-[calc(100vh-200px)] w-[380px] flex-shrink-0 overflow-hidden border-card-border hover-elevate active-elevate-2 transition-all duration-300"
@@ -207,8 +222,8 @@ export default function ConceptBox({
 
       {/* Content */}
       <div className="relative z-10 flex h-full flex-col p-6">
-        {/* Category Badge */}
-        <div className="mb-4">
+        {/* Category Badge and Last Fetched */}
+        <div className="mb-4 flex items-start justify-between gap-4">
           <Badge
             variant="secondary"
             className={`${categoryColor} text-primary-foreground backdrop-blur-sm`}
@@ -216,6 +231,12 @@ export default function ConceptBox({
           >
             {category}
           </Badge>
+          {lastFetched && (
+            <div className="text-xs text-muted-foreground text-right" data-testid="text-last-fetched">
+              Last fetched:<br />
+              {lastFetched}
+            </div>
+          )}
         </div>
 
         {/* Title */}

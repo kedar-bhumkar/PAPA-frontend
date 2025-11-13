@@ -23,7 +23,7 @@ export default function Home() {
     return endpoint;
   };
 
-  const { data: events, isLoading: eventsLoading } = useQuery<EventData[]>({
+  const { data: eventsResponse, isLoading: eventsLoading } = useQuery<{ data: EventData[], createdAt: string | null }>({
     queryKey: ["/api/events", userId],
     queryFn: async () => {
       const response = await fetch(buildQueryUrl("/api/events"));
@@ -32,7 +32,7 @@ export default function Home() {
     },
   });
 
-  const { data: calendarEvents, isLoading: calendarLoading } = useQuery<CalendarEventData[]>({
+  const { data: calendarResponse, isLoading: calendarLoading } = useQuery<{ data: CalendarEventData[], createdAt: string | null }>({
     queryKey: ["/api/calendar", userId],
     queryFn: async () => {
       const response = await fetch(buildQueryUrl("/api/calendar"));
@@ -41,7 +41,7 @@ export default function Home() {
     },
   });
 
-  const { data: expenseItems, isLoading: expensesLoading } = useQuery<ExpenseItem[]>({
+  const { data: expensesResponse, isLoading: expensesLoading } = useQuery<{ data: ExpenseItem[], createdAt: string | null }>({
     queryKey: ["/api/expenses", userId],
     queryFn: async () => {
       const response = await fetch(buildQueryUrl("/api/expenses"));
@@ -50,7 +50,7 @@ export default function Home() {
     },
   });
 
-  const { data: investmentData, isLoading: investmentsLoading } = useQuery<InvestmentData>({
+  const { data: investmentsResponse, isLoading: investmentsLoading } = useQuery<{ data: InvestmentData | null, createdAt: string | null }>({
     queryKey: ["/api/investments", userId],
     queryFn: async () => {
       const response = await fetch(buildQueryUrl("/api/investments"));
@@ -59,7 +59,7 @@ export default function Home() {
     },
   });
 
-  const { data: researchItems, isLoading: researchLoading } = useQuery<ResearchItem[]>({
+  const { data: researchResponse, isLoading: researchLoading } = useQuery<{ data: ResearchItem[], createdAt: string | null }>({
     queryKey: ["/api/research", userId],
     queryFn: async () => {
       const response = await fetch(buildQueryUrl("/api/research"));
@@ -67,6 +67,18 @@ export default function Home() {
       return response.json();
     },
   });
+
+  // Extract data from responses
+  const events = eventsResponse?.data;
+  const eventsCreatedAt = eventsResponse?.createdAt;
+  const calendarEvents = calendarResponse?.data;
+  const calendarCreatedAt = calendarResponse?.createdAt;
+  const expenseItems = expensesResponse?.data;
+  const expensesCreatedAt = expensesResponse?.createdAt;
+  const investmentData = investmentsResponse?.data;
+  const investmentsCreatedAt = investmentsResponse?.createdAt;
+  const researchItems = researchResponse?.data;
+  const researchCreatedAt = researchResponse?.createdAt;
 
   const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading || researchLoading;
 
@@ -79,6 +91,7 @@ export default function Home() {
       category: "Events",
       imageUrl: eventBg1,
       categoryColor: "bg-primary/20",
+      createdAt: eventsCreatedAt,
       items: events.map((event) => ({
         type: "event" as const,
         date: event.date,
@@ -96,6 +109,7 @@ export default function Home() {
       category: "Calendar",
       imageUrl: calendarBg,
       categoryColor: "bg-cyan-500/20",
+      createdAt: calendarCreatedAt,
       items: calendarEvents.map((calEvent) => ({
         type: "calendar" as const,
         summary: calEvent.summary,
@@ -113,6 +127,7 @@ export default function Home() {
       category: "Research",
       imageUrl: researchBg,
       categoryColor: "bg-purple-500/20",
+      createdAt: researchCreatedAt,
       items: researchItems.map((researchItem) => ({
         type: "research" as const,
         task: researchItem.task,
@@ -128,6 +143,7 @@ export default function Home() {
       category: "Expenses",
       imageUrl: expensesBg,
       categoryColor: "bg-amber-500/20",
+      createdAt: expensesCreatedAt,
       items: expenseItems.map((item) => ({
         type: "expense" as const,
         ...item,
@@ -142,6 +158,7 @@ export default function Home() {
       category: "Investments",
       imageUrl: investmentBg,
       categoryColor: "bg-emerald-500/20",
+      createdAt: investmentsCreatedAt,
       items: [{
         type: "investment" as const,
         ...investmentData,
