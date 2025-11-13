@@ -74,6 +74,10 @@ A visually stunning React application designed to showcase events, calendar item
       - Renders bullet points (-, •, *) with colored bullet markers and indentation
       - Renders numbered lists (1., 2., 3., etc.) with colored numbers and indentation
       - Handles standalone numbered markers (numbers on separate lines) by combining with next line
+      - **Automatic hyperlink detection**: URLs (http://, https://, www.) are automatically converted to clickable links
+        - Links open in new tab with security attributes (target="_blank", rel="noopener noreferrer")
+        - Styled in primary color with underline and hover effect
+        - Trailing punctuation (.,;)]}!?) automatically stripped from URLs
       - Proper spacing between sections and paragraphs for improved readability
       - Works for both structured text with headings and unstructured continuous text
     - Displays full research task as prominent title and complete result text
