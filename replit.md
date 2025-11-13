@@ -62,6 +62,11 @@ A visually stunning React application designed to showcase events, calendar item
   - Backward compatible with legacy format: `[{"task":"", "result": ""}]`
   - Shows task title prominently with truncated result preview (2 lines)
   - Hover-to-expand functionality: Expands on hover to show full result text
+  - **Pop-up modal feature**: Maximize2 icon on each research item opens a dialog modal
+    - Dialog overlays cards and covers 80% of viewport (width and height)
+    - Displays full research task as title and complete result text
+    - Well-formatted content with whitespace preservation and scrolling support
+    - Closes via ESC key, backdrop click, or close button
   - Smooth 200ms transitions between truncated and expanded states
   - Purple gradient background (bg-purple-500/20)
   - Zod schema validation for data integrity
