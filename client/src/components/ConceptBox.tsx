@@ -113,6 +113,63 @@ function formatLastFetched(dateString: string | null | undefined): string {
   }
 }
 
+// Helper function to detect URLs and convert them to clickable links
+function renderTextWithLinks(text: string): (string | JSX.Element)[] {
+  // Regex to match URLs (http, https, www)
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  const parts: (string | JSX.Element)[] = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = urlRegex.exec(text)) !== null) {
+    // Add text before the URL
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    
+    // Clean up the URL by removing trailing punctuation
+    let url = match[0];
+    let trailingPunctuation = '';
+    
+    // Remove common trailing punctuation: . , ; ) ] } ! ?
+    const punctuationRegex = /([.,;)\]}!?]+)$/;
+    const punctMatch = url.match(punctuationRegex);
+    if (punctMatch) {
+      trailingPunctuation = punctMatch[1];
+      url = url.slice(0, -trailingPunctuation.length);
+    }
+    
+    // Add https:// if URL starts with www
+    const href = url.startsWith('www.') ? `https://${url}` : url;
+    
+    parts.push(
+      <a
+        key={`link-${match.index}`}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-primary hover:text-primary/80 underline transition-colors"
+      >
+        {url}
+      </a>
+    );
+    
+    // Add the trailing punctuation after the link
+    if (trailingPunctuation) {
+      parts.push(trailingPunctuation);
+    }
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Add remaining text after the last URL
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+  
+  return parts.length > 0 ? parts : [text];
+}
+
 // Component to render formatted research text with headings, lists, and spacing
 function FormattedResearchContent({ text }: { text: string }) {
   // First, try to intelligently split continuous text by section markers
@@ -174,14 +231,15 @@ function FormattedResearchContent({ text }: { text: string }) {
     if (isHeading) {
       elements.push(
         <div key={i} className="font-bold text-card-foreground mt-4 mb-2 text-lg">
-          {trimmedLine}
+          {renderTextWithLinks(trimmedLine)}
         </div>
       );
     } else if (isBullet) {
+      const bulletContent = trimmedLine.replace(/^[-•*]\s/, '');
       elements.push(
         <div key={i} className="flex gap-2 mb-2 ml-4">
           <span className="text-primary flex-shrink-0">•</span>
-          <span className="text-card-foreground">{trimmedLine.replace(/^[-•*]\s/, '')}</span>
+          <span className="text-card-foreground">{renderTextWithLinks(bulletContent)}</span>
         </div>
       );
     } else if (isNumberedItem) {
@@ -191,7 +249,7 @@ function FormattedResearchContent({ text }: { text: string }) {
         elements.push(
           <div key={i} className="flex gap-2 mb-2 ml-4">
             <span className="text-primary flex-shrink-0 font-medium">{match[1]}</span>
-            <span className="text-card-foreground">{match[2]}</span>
+            <span className="text-card-foreground">{renderTextWithLinks(match[2])}</span>
           </div>
         );
       }
@@ -207,13 +265,13 @@ function FormattedResearchContent({ text }: { text: string }) {
         if (/^[A-Z][a-z\s]+\([^)]+\):/.test(trimmedPart)) {
           elements.push(
             <div key={`${i}-${partIdx}-heading`} className="font-bold text-card-foreground mt-4 mb-2 text-lg">
-              {trimmedPart}
+              {renderTextWithLinks(trimmedPart)}
             </div>
           );
         } else {
           elements.push(
             <p key={`${i}-${partIdx}`} className="text-card-foreground mb-3 leading-relaxed">
-              {trimmedPart}
+              {renderTextWithLinks(trimmedPart)}
             </p>
           );
         }
