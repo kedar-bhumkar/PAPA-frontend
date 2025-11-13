@@ -485,21 +485,31 @@ export default function ConceptBox({
 
     {/* Research Details Dialog */}
     <Dialog open={!!selectedResearch} onOpenChange={(open) => !open && setSelectedResearch(null)}>
-      <DialogContent className="w-[80vw] h-[80vh] max-w-[80vw] sm:w-[80vw] sm:max-w-[80vw] overflow-y-auto" data-testid="dialog-research-details">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-card-foreground pr-8" data-testid="text-dialog-title">
-            {selectedResearch?.task}
-          </DialogTitle>
-        </DialogHeader>
-        <DialogDescription asChild>
-          <div className="mt-4">
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              <div className="text-base leading-relaxed text-card-foreground whitespace-pre-wrap" data-testid="text-dialog-result">
-                {selectedResearch?.result}
+      <DialogContent 
+        className="w-[80vw] h-[80vh] max-w-[80vw] sm:w-[80vw] sm:max-w-[80vw] overflow-hidden border-primary/20 bg-gradient-to-br from-purple-500/10 via-card to-card backdrop-blur-xl" 
+        data-testid="dialog-research-details"
+      >
+        <div className="h-full overflow-y-auto hide-scrollbar pr-2">
+          <DialogHeader className="sticky top-0 bg-gradient-to-b from-card via-card/95 to-transparent pb-4 z-10 backdrop-blur-sm">
+            <DialogTitle className="text-3xl font-bold text-card-foreground pr-8" data-testid="text-dialog-title">
+              {selectedResearch?.task}
+            </DialogTitle>
+            <div className="mt-2">
+              <Badge variant="secondary" className="bg-purple-500/20 text-primary-foreground backdrop-blur-sm">
+                Research
+              </Badge>
+            </div>
+          </DialogHeader>
+          <DialogDescription asChild>
+            <div className="mt-6 pb-4">
+              <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm">
+                <div className="text-base leading-relaxed text-card-foreground whitespace-pre-wrap" data-testid="text-dialog-result">
+                  {selectedResearch?.result}
+                </div>
               </div>
             </div>
-          </div>
-        </DialogDescription>
+          </DialogDescription>
+        </div>
       </DialogContent>
     </Dialog>
     </>
