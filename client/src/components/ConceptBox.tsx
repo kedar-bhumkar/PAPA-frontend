@@ -143,6 +143,10 @@ function FormattedResearchContent({ text }: { text: string }) {
     processedText = paragraphs.join('\n\n');
   }
   
+  // 6. Handle standalone numbered markers (e.g., lines with just "1.", "2.", etc.)
+  // Combine them with the next line to create proper numbered items
+  processedText = processedText.replace(/^(\d+\.)\s*\n+/gm, '$1 ');
+  
   const lines = processedText.split('\n');
   const elements: JSX.Element[] = [];
   
@@ -159,13 +163,13 @@ function FormattedResearchContent({ text }: { text: string }) {
     // Check if line is a heading - expanded patterns
     const isHeading = 
       trimmedLine.endsWith(':') || 
-      /^\d+\./.test(trimmedLine) ||
       /^-\s+[A-Z]/.test(trimmedLine) || // Starts with "- Capital"
       /^[A-Z][a-z\s]+\([^)]+\):/.test(trimmedLine) || // "Word (Details):"
       (/^[A-Z\s]+:?$/.test(trimmedLine) && trimmedLine.length < 50);
     
-    // Check if line is a bullet point
+    // Check if line is a bullet point or numbered item
     const isBullet = /^[-•*]\s/.test(trimmedLine) && !isHeading;
+    const isNumberedItem = /^\d+\.\s/.test(trimmedLine) && !isHeading;
     
     if (isHeading) {
       elements.push(
@@ -180,6 +184,17 @@ function FormattedResearchContent({ text }: { text: string }) {
           <span className="text-card-foreground">{trimmedLine.replace(/^[-•*]\s/, '')}</span>
         </div>
       );
+    } else if (isNumberedItem) {
+      // Extract the number and content
+      const match = trimmedLine.match(/^(\d+\.)\s(.+)/);
+      if (match) {
+        elements.push(
+          <div key={i} className="flex gap-2 mb-2 ml-4">
+            <span className="text-primary flex-shrink-0 font-medium">{match[1]}</span>
+            <span className="text-card-foreground">{match[2]}</span>
+          </div>
+        );
+      }
     } else {
       // For long paragraphs, look for inline section headers and split them
       const parts = trimmedLine.split(/(?<=\.\s)(?=[A-Z][a-z\s]+\([^)]+\):)/);
