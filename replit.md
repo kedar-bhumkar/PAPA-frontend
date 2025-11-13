@@ -62,6 +62,7 @@ A visually stunning React application designed to showcase events, calendar item
   - Backward compatible with legacy format: `[{"task":"", "result": ""}]`
   - Shows task title prominently with truncated result preview (2 lines)
   - Hover-to-expand functionality: Expands on hover to show full result text
+  - Maximize2 icon button positioned with z-index to remain visible and clickable even when text expands
   - **Pop-up modal feature**: Maximize2 icon on each research item opens a dialog modal
     - Dialog overlays cards and covers 80% of viewport (width and height)
     - **Visual styling matches card design**: Purple gradient background (`bg-gradient-to-br from-purple-500/10 via-card to-card`), backdrop blur effects, and card-style borders
