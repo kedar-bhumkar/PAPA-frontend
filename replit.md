@@ -70,7 +70,9 @@ A visually stunning React application designed to showcase events, calendar item
     - **Enhanced text formatting** via FormattedResearchContent component:
       - Detects and formats section headings (ending with colons, numbered, etc.) as bold with larger text
       - Automatically splits long continuous text into readable paragraphs (2-3 sentences each)
-      - Renders bullet points with colored markers and indentation
+      - Renders bullet points (-, •, *) with colored bullet markers and indentation
+      - Renders numbered lists (1., 2., 3., etc.) with colored numbers and indentation
+      - Handles standalone numbered markers (numbers on separate lines) by combining with next line
       - Proper spacing between sections and paragraphs for improved readability
       - Works for both structured text with headings and unstructured continuous text
     - Displays full research task as prominent title and complete result text
