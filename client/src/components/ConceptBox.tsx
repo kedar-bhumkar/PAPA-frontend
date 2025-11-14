@@ -58,6 +58,11 @@ type DetailDialogState = {
   badgeColor: string;
   content: string;
 } | {
+  kind: "ainews-summary";
+  badgeLabel: string;
+  badgeColor: string;
+  content: string;
+} | {
   kind: "ainews-source";
   source: string;
   badgeLabel: string;
@@ -311,6 +316,29 @@ function FormattedResearchContent({ text }: { text: string }) {
   return <>{elements}</>;
 }
 
+// Reusable component for truncated text with hover-to-expand
+// Accepts React nodes to preserve hyperlinks and other formatting
+function TruncatedReveal({ 
+  children, 
+  clampLines = 2, 
+  testId 
+}: { 
+  children: React.ReactNode; 
+  clampLines?: number; 
+  testId?: string;
+}) {
+  const clampClass = clampLines === 2 ? 'line-clamp-2' : clampLines === 3 ? 'line-clamp-3' : 'line-clamp-2';
+  
+  return (
+    <div 
+      className={`text-sm text-muted-foreground ${clampClass} hover:line-clamp-none transition-all duration-200 cursor-help pr-2`}
+      data-testid={testId}
+    >
+      {children}
+    </div>
+  );
+}
+
 // Expense Item Component with expand/collapse functionality
 function ExpenseItemComponent({ item, index }: { item: ExpenseItem; index: number }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -412,6 +440,15 @@ export default function ConceptBox({
       badgeLabel: "Research",
       badgeColor: "bg-purple-500/20",
       content: item.result,
+    });
+  };
+  
+  const openAINewsSummaryDetail = (item: AINewsSummaryItem) => {
+    setDetailDialog({
+      kind: "ainews-summary",
+      badgeLabel: "AI News Summary",
+      badgeColor: "bg-blue-500/20",
+      content: item.summary,
     });
   };
   
@@ -545,12 +582,9 @@ export default function ConceptBox({
                       <div className="text-base font-semibold text-card-foreground mb-2">
                         {item.task}
                       </div>
-                      <div 
-                        className="text-sm text-muted-foreground line-clamp-2 hover:line-clamp-none transition-all duration-200 cursor-help pr-2"
-                        data-testid={`text-result-${index}`}
-                      >
-                        {item.result}
-                      </div>
+                      <TruncatedReveal clampLines={2} testId={`text-result-${index}`}>
+                        {renderTextWithLinks(item.result)}
+                      </TruncatedReveal>
                     </div>
                     <button
                       onClick={() => openResearchDetail(item)}
@@ -565,12 +599,22 @@ export default function ConceptBox({
               ) : item.type === "ainews-summary" ? (
                 <>
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-blue-500 mb-2">
-                      Summary
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="text-xs font-semibold uppercase tracking-wider text-blue-500">
+                        Summary
+                      </div>
+                      <button
+                        onClick={() => openAINewsSummaryDetail(item)}
+                        className="relative z-10 flex-shrink-0 text-primary hover:text-primary/80 transition-colors p-1"
+                        data-testid={`button-expand-ainews-summary-${index}`}
+                        aria-label="View full AI news summary"
+                      >
+                        <Maximize2 className="h-4 w-4" />
+                      </button>
                     </div>
-                    <div className="text-sm text-card-foreground leading-relaxed">
-                      {item.summary}
-                    </div>
+                    <TruncatedReveal clampLines={2} testId={`text-summary-${index}`}>
+                      {renderTextWithLinks(item.summary)}
+                    </TruncatedReveal>
                   </div>
                 </>
               ) : item.type === "ainews-source" ? (
@@ -580,9 +624,9 @@ export default function ConceptBox({
                       <div className="text-xs font-medium uppercase tracking-wider text-primary mb-1">
                         {item.source}
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {item.items.length} {item.items.length === 1 ? 'item' : 'items'}
-                      </div>
+                      <TruncatedReveal clampLines={2} testId={`text-source-preview-${index}`}>
+                        {renderTextWithLinks(item.items.map(i => i.title || i.details).join(' • '))}
+                      </TruncatedReveal>
                     </div>
                     <button
                       onClick={() => openAINewsSourceDetail(item)}
@@ -743,7 +787,11 @@ export default function ConceptBox({
         <div className="h-full overflow-y-auto hide-scrollbar pr-2">
           <DialogHeader className="sticky top-0 bg-gradient-to-b from-card via-card/95 to-transparent pb-4 z-10 backdrop-blur-sm">
             <DialogTitle className="text-3xl font-bold text-card-foreground pr-8" data-testid="text-dialog-title">
-              {detailDialog?.kind === "research" ? detailDialog.title : detailDialog?.source}
+              {detailDialog?.kind === "research" 
+                ? detailDialog.title 
+                : detailDialog?.kind === "ainews-summary"
+                ? "AI News Summary"
+                : detailDialog?.source}
             </DialogTitle>
             <div className="mt-2">
               <Badge variant="secondary" className={`${detailDialog?.badgeColor} text-primary-foreground backdrop-blur-sm`}>
@@ -755,6 +803,10 @@ export default function ConceptBox({
             <div className="mt-6 pb-4">
               {detailDialog?.kind === "research" ? (
                 <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-result">
+                  <FormattedResearchContent text={detailDialog.content} />
+                </div>
+              ) : detailDialog?.kind === "ainews-summary" ? (
+                <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-summary">
                   <FormattedResearchContent text={detailDialog.content} />
                 </div>
               ) : detailDialog?.kind === "ainews-source" ? (
