@@ -167,6 +167,7 @@ export default function Home() {
           type: "ainews-source" as const,
           source: sourceData.source,
           items: sourceData.item_details,
+          message_id: sourceData.message_id,
         });
       }
     });

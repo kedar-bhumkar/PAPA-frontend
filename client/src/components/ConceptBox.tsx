@@ -622,8 +622,22 @@ export default function ConceptBox({
                 <>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium uppercase tracking-wider text-primary mb-1">
-                        {item.source}
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="text-xs font-medium uppercase tracking-wider text-primary">
+                          {item.source}
+                        </div>
+                        {item.message_id && (
+                          <a
+                            href={`https://mail.google.com/mail/u/0/#inbox/${item.message_id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
+                            data-testid={`link-ainews-gmail-${index}`}
+                            aria-label="View in Gmail inbox"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        )}
                       </div>
                       <TruncatedReveal clampLines={2} testId={`text-source-preview-${index}`}>
                         {renderTextWithLinks(item.items.map(i => i.title || i.details).join(' • '))}
