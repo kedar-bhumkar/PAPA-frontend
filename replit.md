@@ -114,19 +114,34 @@ A visually stunning React application designed to showcase events, calendar item
   - Currency values: All amounts come pre-formatted from API with currency symbols ($, ₹), comma separators, and decimal places already included. No client-side formatting is applied.
 - Backend transformation layer that filters, sorts, and formats expense data
 - **AI News display** with summary and source-grouped items:
-  - **Summary section**: Displayed first in highlighted blue box with border, shows key AI news items summarized across all sources
+  - **Summary section**: Displayed first in highlighted blue box with border
+    - Shows truncated summary (2 lines) with inline hover-to-expand functionality
+    - Expand button (Maximize2 icon) opens modal with full formatted summary
+    - Preserves clickable hyperlinks in both truncated and expanded views
   - **Source-grouped items**: News items grouped by source (ai-news, dailydoseofds, demetrios)
-    - Each source shows name and item count (e.g., "3 items")
-    - Single expand button per source (not per item)
-  - **Source-level modal**: Clicking expand button opens modal showing ALL items from that source
+    - Shows source name and concatenated preview of item titles/details (2 lines)
+    - Hover-to-expand reveals full preview inline
+    - Expand button (Maximize2 icon) opens modal with all items from that source
+    - Hyperlinks automatically detected and clickable in preview
+  - **Summary modal**: Clicking summary expand button opens dedicated modal
+    - Modal title: "AI News Summary"
+    - Modal badge: "AI News Summary" with blue color scheme (bg-blue-500/20)
+    - Full summary text displayed with FormattedResearchContent
+    - Automatic hyperlink detection, headings, lists, and paragraph formatting
+  - **Source-level modal**: Clicking source expand button opens modal showing ALL items
     - Modal title: Source name
-    - Modal badge: "AI News • {source}" with blue color scheme (bg-blue-500/20)
+    - Modal badge: "AI News • {source}" with blue color scheme
     - All items displayed with individual title + formatted details
     - Uses FormattedResearchContent for hyperlinks, headings, lists, and formatting
-  - **Unified modal architecture**: Single dialog component handles both research and AI news
+  - **Unified modal architecture**: Single dialog component handles research and AI news
     - Discriminated union (DetailDialogState) for type-safe modal content
     - Research type: Shows single task + result
-    - AI News type: Shows all items from selected source
+    - AI News Summary type: Shows full summary text
+    - AI News Source type: Shows all items from selected source
+  - **TruncatedReveal component**: Reusable component for consistent truncate-hover pattern
+    - Accepts React nodes to preserve hyperlinks and formatting
+    - Used across Research, AI News summary, and AI News source previews
+    - 2-line truncation with smooth hover expansion (200ms transitions)
   - Blue gradient background (bg-blue-500/20) for visual distinction
   - JSON structure: `{summary: string, details: [{source: string, item_details: [{title, details}]}]}`
 - Clickable external links that open in new tabs.
