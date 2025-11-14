@@ -43,6 +43,7 @@ export interface AINewsSourceItem {
     title: string;
     details: string;
   }>;
+  message_id?: string;
 }
 
 export interface ExpenseDetail {

@@ -28,6 +28,7 @@ export const agentData = pgTable("agent_output", {
   agentResponse: text("agent_response"),
   status: text("status"),
   userId: text("user_id"),
+  messageId: text("message_id"),
 });
 
 export type AgentData = typeof agentData.$inferSelect;
@@ -157,6 +158,7 @@ export const aiNewsItemSchema = z.object({
 export const aiNewsSourceSchema = z.object({
   source: z.string(),
   item_details: z.array(aiNewsItemSchema),
+  message_id: z.string().optional(),
 });
 
 export const aiNewsResponseSchema = z.object({
