@@ -9,12 +9,14 @@ import {
   expenseDataSchema,
   investmentDataSchema,
   researchResponseSchema,
+  aiNewsResponseSchema,
   type EventData,
   type CalendarEventData,
   type ExpenseData,
   type ExpenseItem,
   type ExpenseDetail,
   type InvestmentData,
+  type AINewsSource,
 } from "@shared/schema";
 import { and, eq, desc, sql } from "drizzle-orm";
 
@@ -376,6 +378,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching research:", error);
       res.status(500).json({ error: "Failed to fetch research" });
+    }
+  });
+
+  // Get AI News data from the latest successful ainews_agent record
+  app.get("/api/ainews", async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      
+      // Build where conditions
+      const conditions = [
+        eq(agentData.agentName, "ainews_agent"),
+        sql`TRIM(${agentData.status}) = 'success'`,
+      ];
+      
+      if (userId) {
+        conditions.push(eq(agentData.userId, userId));
+      }
+
+      // Select the latest successful record where agent_name='ainews_agent', LIMIT 1
+      const latestRecord = await db
+        .select()
+        .from(agentData)
+        .where(and(...conditions))
+        .orderBy(desc(agentData.createdAt))
+        .limit(1);
+
+      let aiNewsData = null;
+      let createdAt: Date | null = null;
+
+      // Parse agent_response JSON from the latest record
+      if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        createdAt = latestRecord[0].createdAt;
+        try {
+          // Handle case where agentResponse might already be parsed or is a string
+          const response = latestRecord[0].agentResponse;
+          const parsed =
+            typeof response === "string" ? JSON.parse(response) : response;
+
+          // Validate against schema
+          aiNewsData = aiNewsResponseSchema.parse(parsed);
+        } catch (parseError) {
+          console.error("Error parsing ainews agent_response:", parseError);
+        }
+      }
+
+      res.json({ data: aiNewsData, createdAt });
+    } catch (error) {
+      console.error("Error fetching AI News:", error);
+      res.status(500).json({ error: "Failed to fetch AI News" });
     }
   });
 

@@ -147,3 +147,23 @@ export const researchResponseSchema = z.object({
 
 export type ResearchItem = z.infer<typeof researchItemSchema>;
 export type ResearchResponse = z.infer<typeof researchResponseSchema>;
+
+// AI News data structure (parsed from JSON)
+export const aiNewsItemSchema = z.object({
+  title: z.string(),
+  details: z.string(),
+});
+
+export const aiNewsSourceSchema = z.object({
+  source: z.string(),
+  item_details: z.array(aiNewsItemSchema),
+});
+
+export const aiNewsResponseSchema = z.object({
+  summary: z.string(),
+  details: z.array(aiNewsSourceSchema),
+});
+
+export type AINewsItem = z.infer<typeof aiNewsItemSchema>;
+export type AINewsSource = z.infer<typeof aiNewsSourceSchema>;
+export type AINewsResponse = z.infer<typeof aiNewsResponseSchema>;

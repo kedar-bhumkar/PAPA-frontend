@@ -7,7 +7,7 @@ import { format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
 
-export type ConceptItem = EventItem | CalendarItem | ExpenseItem | InvestmentItem | ResearchItem;
+export type ConceptItem = EventItem | CalendarItem | ExpenseItem | InvestmentItem | ResearchItem | AINewsSummaryItem | AINewsSourceItem;
 
 export interface EventItem {
   type: "event";
@@ -31,10 +31,39 @@ export interface ResearchItem {
   result: string;
 }
 
+export interface AINewsSummaryItem {
+  type: "ainews-summary";
+  summary: string;
+}
+
+export interface AINewsSourceItem {
+  type: "ainews-source";
+  source: string;
+  items: Array<{
+    title: string;
+    details: string;
+  }>;
+}
+
 export interface ExpenseDetail {
   label: string;
   amount: number;
 }
+
+// Unified detail dialog state for expandable items (research, AI news, etc.)
+type DetailDialogState = {
+  kind: "research";
+  title: string;
+  badgeLabel: string;
+  badgeColor: string;
+  content: string;
+} | {
+  kind: "ainews-source";
+  source: string;
+  badgeLabel: string;
+  badgeColor: string;
+  items: Array<{ title: string; details: string }>;
+} | null;
 
 export interface ExpenseItem {
   type: "expense";
@@ -373,7 +402,28 @@ export default function ConceptBox({
   createdAt,
 }: ConceptBoxProps) {
   const lastFetched = formatLastFetched(createdAt);
-  const [selectedResearch, setSelectedResearch] = useState<ResearchItem | null>(null);
+  const [detailDialog, setDetailDialog] = useState<DetailDialogState>(null);
+  
+  // Helper functions to open detail dialogs
+  const openResearchDetail = (item: ResearchItem) => {
+    setDetailDialog({
+      kind: "research",
+      title: item.task,
+      badgeLabel: "Research",
+      badgeColor: "bg-purple-500/20",
+      content: item.result,
+    });
+  };
+  
+  const openAINewsSourceDetail = (item: AINewsSourceItem) => {
+    setDetailDialog({
+      kind: "ainews-source",
+      source: item.source,
+      badgeLabel: `AI News • ${item.source}`,
+      badgeColor: "bg-blue-500/20",
+      items: item.items,
+    });
+  };
   
   return (
     <>
@@ -503,10 +553,42 @@ export default function ConceptBox({
                       </div>
                     </div>
                     <button
-                      onClick={() => setSelectedResearch(item)}
+                      onClick={() => openResearchDetail(item)}
                       className="relative z-10 flex-shrink-0 text-primary hover:text-primary/80 transition-colors p-1"
                       data-testid={`button-expand-research-${index}`}
                       aria-label="View full research details"
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </>
+              ) : item.type === "ainews-summary" ? (
+                <>
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-3">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-blue-500 mb-2">
+                      Summary
+                    </div>
+                    <div className="text-sm text-card-foreground leading-relaxed">
+                      {item.summary}
+                    </div>
+                  </div>
+                </>
+              ) : item.type === "ainews-source" ? (
+                <>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium uppercase tracking-wider text-primary mb-1">
+                        {item.source}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {item.items.length} {item.items.length === 1 ? 'item' : 'items'}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => openAINewsSourceDetail(item)}
+                      className="relative z-10 flex-shrink-0 text-primary hover:text-primary/80 transition-colors p-1"
+                      data-testid={`button-expand-ainews-source-${index}`}
+                      aria-label="View AI news from this source"
                     >
                       <Maximize2 className="h-4 w-4" />
                     </button>
@@ -652,30 +734,43 @@ export default function ConceptBox({
       `}</style>
     </Card>
 
-    {/* Research Details Dialog */}
-    <Dialog open={!!selectedResearch} onOpenChange={(open) => !open && setSelectedResearch(null)}>
+    {/* Unified Details Dialog for Research and AI News */}
+    <Dialog open={!!detailDialog} onOpenChange={(open) => !open && setDetailDialog(null)}>
       <DialogContent 
         className="w-[80vw] h-[80vh] max-w-[80vw] sm:w-[80vw] sm:max-w-[80vw] overflow-hidden border-primary/20 bg-gradient-to-br from-purple-500/10 via-card to-card backdrop-blur-xl" 
-        data-testid="dialog-research-details"
+        data-testid={`dialog-${detailDialog?.kind}-details`}
       >
         <div className="h-full overflow-y-auto hide-scrollbar pr-2">
           <DialogHeader className="sticky top-0 bg-gradient-to-b from-card via-card/95 to-transparent pb-4 z-10 backdrop-blur-sm">
             <DialogTitle className="text-3xl font-bold text-card-foreground pr-8" data-testid="text-dialog-title">
-              {selectedResearch?.task}
+              {detailDialog?.kind === "research" ? detailDialog.title : detailDialog?.source}
             </DialogTitle>
             <div className="mt-2">
-              <Badge variant="secondary" className="bg-purple-500/20 text-primary-foreground backdrop-blur-sm">
-                Research
+              <Badge variant="secondary" className={`${detailDialog?.badgeColor} text-primary-foreground backdrop-blur-sm`}>
+                {detailDialog?.badgeLabel}
               </Badge>
             </div>
           </DialogHeader>
           <DialogDescription asChild>
             <div className="mt-6 pb-4">
-              <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-result">
-                {selectedResearch?.result && (
-                  <FormattedResearchContent text={selectedResearch.result} />
-                )}
-              </div>
+              {detailDialog?.kind === "research" ? (
+                <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-result">
+                  <FormattedResearchContent text={detailDialog.content} />
+                </div>
+              ) : detailDialog?.kind === "ainews-source" ? (
+                <div className="space-y-4">
+                  {detailDialog.items.map((item, idx) => (
+                    <div key={idx} className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid={`ainews-item-${idx}`}>
+                      <div className="text-xl font-bold text-card-foreground mb-3">
+                        {item.title}
+                      </div>
+                      <div className="text-card-foreground">
+                        <FormattedResearchContent text={item.details} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </DialogDescription>
         </div>

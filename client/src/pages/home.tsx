@@ -3,7 +3,7 @@ import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
-import { type EventData, type CalendarEventData, type ExpenseItem, type InvestmentData, type ResearchItem } from "@shared/schema";
+import { type EventData, type CalendarEventData, type ExpenseItem, type InvestmentData, type ResearchItem, type AINewsResponse } from "@shared/schema";
 import eventBg1 from "@assets/generated_images/Event_card_gradient_background_8c68dd6e.png";
 import calendarBg from "@assets/generated_images/Calendar_card_gradient_background_f49550e0.png";
 import expensesBg from "@assets/generated_images/Expenses_card_gradient_background_dd3e9188.png";
@@ -68,6 +68,15 @@ export default function Home() {
     },
   });
 
+  const { data: aiNewsResponse, isLoading: aiNewsLoading } = useQuery<{ data: AINewsResponse | null, createdAt: string | null }>({
+    queryKey: ["/api/ainews", userId],
+    queryFn: async () => {
+      const response = await fetch(buildQueryUrl("/api/ainews"));
+      if (!response.ok) throw new Error("Failed to fetch AI news");
+      return response.json();
+    },
+  });
+
   // Extract data from responses
   const events = eventsResponse?.data;
   const eventsCreatedAt = eventsResponse?.createdAt;
@@ -79,8 +88,10 @@ export default function Home() {
   const investmentsCreatedAt = investmentsResponse?.createdAt;
   const researchItems = researchResponse?.data;
   const researchCreatedAt = researchResponse?.createdAt;
+  const aiNewsData = aiNewsResponse?.data;
+  const aiNewsCreatedAt = aiNewsResponse?.createdAt;
 
-  const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading || researchLoading;
+  const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading || researchLoading || aiNewsLoading;
 
   const concepts: ConceptBoxProps[] = [];
 
@@ -134,6 +145,42 @@ export default function Home() {
         result: researchItem.result,
       })),
     });
+  }
+
+  // Add AI News card if we have AI news data
+  // Show summary first, then group by sources
+  if (aiNewsData && aiNewsData.details && aiNewsData.details.length > 0) {
+    const aiNewsItems = [];
+    
+    // Add summary item first
+    if (aiNewsData.summary) {
+      aiNewsItems.push({
+        type: "ainews-summary" as const,
+        summary: aiNewsData.summary,
+      });
+    }
+    
+    // Add source-level items
+    aiNewsData.details.forEach((sourceData) => {
+      if (sourceData.item_details && sourceData.item_details.length > 0) {
+        aiNewsItems.push({
+          type: "ainews-source" as const,
+          source: sourceData.source,
+          items: sourceData.item_details,
+        });
+      }
+    });
+
+    if (aiNewsItems.length > 0) {
+      concepts.push({
+        title: "AI News",
+        category: "AI News",
+        imageUrl: researchBg, // Using research background temporarily
+        categoryColor: "bg-blue-500/20",
+        createdAt: aiNewsCreatedAt,
+        items: aiNewsItems,
+      });
+    }
   }
 
   // Add Expenses card if we have expense items
