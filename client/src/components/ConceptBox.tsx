@@ -69,6 +69,7 @@ type DetailDialogState = {
   badgeLabel: string;
   badgeColor: string;
   items: Array<{ title: string; details: string }>;
+  message_id?: string;
 } | null;
 
 export interface ExpenseItem {
@@ -460,6 +461,7 @@ export default function ConceptBox({
       badgeLabel: `AI News • ${item.source}`,
       badgeColor: "bg-blue-500/20",
       items: item.items,
+      message_id: item.message_id,
     });
   };
   
@@ -801,13 +803,27 @@ export default function ConceptBox({
       >
         <div className="h-full overflow-y-auto hide-scrollbar pr-2">
           <DialogHeader className="sticky top-0 bg-gradient-to-b from-card via-card/95 to-transparent pb-4 z-10 backdrop-blur-sm">
-            <DialogTitle className="text-3xl font-bold text-card-foreground pr-8" data-testid="text-dialog-title">
-              {detailDialog?.kind === "research" 
-                ? detailDialog.title 
-                : detailDialog?.kind === "ainews-summary"
-                ? "AI News Summary"
-                : detailDialog?.source}
-            </DialogTitle>
+            <div className="flex items-center gap-3">
+              <DialogTitle className="text-3xl font-bold text-card-foreground" data-testid="text-dialog-title">
+                {detailDialog?.kind === "research" 
+                  ? detailDialog.title 
+                  : detailDialog?.kind === "ainews-summary"
+                  ? "AI News Summary"
+                  : detailDialog?.source}
+              </DialogTitle>
+              {detailDialog?.kind === "ainews-source" && detailDialog.message_id && (
+                <a
+                  href={`https://mail.google.com/mail/u/0/#inbox/${detailDialog.message_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
+                  data-testid="link-dialog-gmail"
+                  aria-label="View in Gmail inbox"
+                >
+                  <ExternalLink className="h-5 w-5" />
+                </a>
+              )}
+            </div>
             <div className="mt-2">
               <Badge variant="secondary" className={`${detailDialog?.badgeColor} text-primary-foreground backdrop-blur-sm`}>
                 {detailDialog?.badgeLabel}

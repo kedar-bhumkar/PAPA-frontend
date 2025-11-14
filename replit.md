@@ -119,7 +119,8 @@ A visually stunning React application designed to showcase events, calendar item
     - Expand button (Maximize2 icon) opens modal with full formatted summary
     - Preserves clickable hyperlinks in both truncated and expanded views
   - **Source-grouped items**: News items grouped by source (ai-news, dailydoseofds, demetrios)
-    - Shows source name and concatenated preview of item titles/details (2 lines)
+    - Shows source name with Gmail link icon (when message_id exists) and concatenated preview of item titles/details (2 lines)
+    - **Gmail inbox link**: ExternalLink icon appears next to source name linking to `https://mail.google.com/mail/u/0/#inbox/<message_id>` when message_id is present (same icon as Events card)
     - Hover-to-expand reveals full preview inline
     - Expand button (Maximize2 icon) opens modal with all items from that source
     - Hyperlinks automatically detected and clickable in preview
@@ -129,7 +130,8 @@ A visually stunning React application designed to showcase events, calendar item
     - Full summary text displayed with FormattedResearchContent
     - Automatic hyperlink detection, headings, lists, and paragraph formatting
   - **Source-level modal**: Clicking source expand button opens modal showing ALL items
-    - Modal title: Source name
+    - Modal title: Source name with Gmail link icon when message_id exists
+    - **Gmail link in modal**: ExternalLink icon appears in modal header next to source name, linking to Gmail inbox
     - Modal badge: "AI News • {source}" with blue color scheme
     - All items displayed with individual title + formatted details
     - Uses FormattedResearchContent for hyperlinks, headings, lists, and formatting
