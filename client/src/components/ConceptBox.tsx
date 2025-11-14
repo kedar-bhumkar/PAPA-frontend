@@ -182,7 +182,7 @@ function renderTextWithLinks(text: string): (string | JSX.Element)[] {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-primary hover:text-primary/80 underline transition-colors"
+        className="text-primary hover:text-primary/80 underline transition-colors break-words inline"
       >
         {url}
       </a>
