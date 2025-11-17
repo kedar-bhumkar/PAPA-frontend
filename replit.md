@@ -45,6 +45,10 @@ A visually stunning React application designed to showcase events, calendar item
   - All API endpoints accept optional `userId` query parameter (e.g., `?userId=demo`)
   - Filters `agent_output` table by `user_id` column when provided
   - Backward compatible - works without userId parameter
+- **AI News JSON Processing**: Special handling for malformed JSON from database
+  - URL-decodes response (handles `%28`, `%29`, and other encoded characters)
+  - Replaces `+` with spaces (URL encoding artifact)
+  - Adds missing closing brackets if JSON ends with `"}]}`  (should be `"}]]}}`)
 
 ### Features
 - Real-time data fetching for events, calendar, research, expenses, and investments.

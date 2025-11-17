@@ -381,6 +381,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint to see raw AI News data
+  app.get("/api/ainews/debug", async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      
+      const conditions = [
+        eq(agentData.agentName, "ainews_agent"),
+        sql`TRIM(${agentData.status}) = 'success'`,
+      ];
+      
+      if (userId) {
+        conditions.push(eq(agentData.userId, userId));
+      }
+
+      const latestRecord = await db
+        .select()
+        .from(agentData)
+        .where(and(...conditions))
+        .orderBy(desc(agentData.createdAt))
+        .limit(1);
+
+      if (latestRecord.length > 0) {
+        const response = latestRecord[0].agentResponse;
+        res.json({ 
+          raw: response,
+          type: typeof response,
+          length: typeof response === 'string' ? response.length : 'N/A',
+          preview: typeof response === 'string' ? response.substring(8850, 8900) : 'N/A'
+        });
+      } else {
+        res.json({ error: "No records found" });
+      }
+    } catch (error) {
+      console.error("Error fetching debug AI News:", error);
+      res.status(500).json({ error: "Failed to fetch debug AI News" });
+    }
+  });
+
   // Get AI News data from the latest successful ainews_agent record
   app.get("/api/ainews", async (req, res) => {
     try {
@@ -412,7 +450,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt = latestRecord[0].createdAt;
         try {
           // Handle case where agentResponse might already be parsed or is a string
-          const response = latestRecord[0].agentResponse;
+          let response = latestRecord[0].agentResponse;
+          let originalResponse = response;
+          
+          // If it's a string, try to URL-decode it first in case it contains encoded characters
+          if (typeof response === "string") {
+            try {
+              // Try double-decoding in case it was encoded twice
+              let decoded = decodeURIComponent(response);
+              // Check if there are still encoded characters
+              if (decoded.includes('%')) {
+                decoded = decodeURIComponent(decoded);
+              }
+              
+              // Fix common JSON formatting issues
+              // Replace + characters with spaces (from URL encoding)
+              decoded = decoded.replace(/\+/g, ' ');
+              
+              // Fix incomplete JSON - add missing closing brackets if needed
+              if (decoded.endsWith('"}]}')) {
+                decoded = decoded + ']}';
+              }
+              
+              response = decoded;
+            } catch (decodeError) {
+              // If decoding fails, use the original string
+              console.warn("Could not URL-decode AI news response, using original");
+            }
+          }
+          
           const parsed =
             typeof response === "string" ? JSON.parse(response) : response;
 
@@ -420,6 +486,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           aiNewsData = aiNewsResponseSchema.parse(parsed);
         } catch (parseError) {
           console.error("Error parsing ainews agent_response:", parseError);
+          // Log more details about the error
+          if (typeof latestRecord[0].agentResponse === 'string') {
+            console.error("Original JSON around position 8863:", latestRecord[0].agentResponse.substring(8850, 8900));
+          }
         }
       }
 
