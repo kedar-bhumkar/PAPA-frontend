@@ -801,7 +801,7 @@ export default function ConceptBox({
         className="w-[80vw] h-[80vh] max-w-[80vw] sm:w-[80vw] sm:max-w-[80vw] overflow-hidden border-primary/20 bg-gradient-to-br from-purple-500/10 via-card to-card backdrop-blur-xl" 
         data-testid={`dialog-${detailDialog?.kind}-details`}
       >
-        <div className="h-full overflow-y-auto hide-scrollbar pr-2">
+        <div className="h-full overflow-y-auto pr-2">
           <DialogHeader className="sticky top-0 bg-gradient-to-b from-card via-card/95 to-transparent pb-4 z-10 backdrop-blur-sm">
             <div className="flex items-center gap-3">
               <DialogTitle className="text-3xl font-bold text-card-foreground" data-testid="text-dialog-title">

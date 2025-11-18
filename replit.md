@@ -85,7 +85,7 @@ A visually stunning React application designed to showcase events, calendar item
       - Proper spacing between sections and paragraphs for improved readability
       - Works for both structured text with headings and unstructured continuous text
     - Displays full research task as prominent title and complete result text
-    - Well-formatted content with hidden scrollbars
+    - Visible vertical scrollbars when content overflows
     - Closes via ESC key, backdrop click, or close button
   - Smooth 200ms transitions between truncated and expanded states
   - Purple gradient background (bg-purple-500/20)
