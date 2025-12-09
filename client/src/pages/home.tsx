@@ -3,7 +3,7 @@ import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
-import { type EventData, type CalendarEventData, type ExpenseItem, type InvestmentData, type ResearchItem, type AINewsResponse } from "@shared/schema";
+import { type EventData, type CalendarEventData, type ExpenseItem, type InvestmentData, type ResearchItem, type AINewsResponse, type ScrapedResponse } from "@shared/schema";
 import eventBg1 from "@assets/generated_images/Event_card_gradient_background_8c68dd6e.png";
 import calendarBg from "@assets/generated_images/Calendar_card_gradient_background_f49550e0.png";
 import expensesBg from "@assets/generated_images/Expenses_card_gradient_background_dd3e9188.png";
@@ -77,6 +77,15 @@ export default function Home() {
     },
   });
 
+  const { data: scrapedResponse, isLoading: scrapedLoading } = useQuery<{ data: ScrapedResponse | null, createdAt: string | null }>({
+    queryKey: ["/api/scraped", userId],
+    queryFn: async () => {
+      const response = await fetch(buildQueryUrl("/api/scraped"));
+      if (!response.ok) throw new Error("Failed to fetch scraped data");
+      return response.json();
+    },
+  });
+
   // Extract data from responses
   const events = eventsResponse?.data;
   const eventsCreatedAt = eventsResponse?.createdAt;
@@ -90,8 +99,10 @@ export default function Home() {
   const researchCreatedAt = researchResponse?.createdAt;
   const aiNewsData = aiNewsResponse?.data;
   const aiNewsCreatedAt = aiNewsResponse?.createdAt;
+  const scrapedData = scrapedResponse?.data;
+  const scrapedCreatedAt = scrapedResponse?.createdAt;
 
-  const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading || researchLoading || aiNewsLoading;
+  const isLoading = eventsLoading || calendarLoading || expensesLoading || investmentsLoading || researchLoading || aiNewsLoading || scrapedLoading;
 
   const concepts: ConceptBoxProps[] = [];
 
@@ -211,6 +222,23 @@ export default function Home() {
         type: "investment" as const,
         ...investmentData,
       }],
+    });
+  }
+
+  // Add Scraped Data card if we have scraped data items
+  if (scrapedData && scrapedData.llm_summary && scrapedData.llm_summary.length > 0) {
+    concepts.push({
+      title: "Scraped Insights",
+      category: "Scraped Data",
+      imageUrl: researchBg,
+      categoryColor: "bg-orange-500/20",
+      createdAt: scrapedCreatedAt,
+      items: scrapedData.llm_summary.map((item) => ({
+        type: "scraped" as const,
+        title: item.title,
+        link: item.link,
+        summary: item.summary,
+      })),
     });
   }
 
