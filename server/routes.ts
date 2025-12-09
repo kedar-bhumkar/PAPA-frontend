@@ -10,6 +10,7 @@ import {
   investmentDataSchema,
   researchResponseSchema,
   aiNewsResponseSchema,
+  scrapedResponseSchema,
   type EventData,
   type CalendarEventData,
   type ExpenseData,
@@ -17,6 +18,7 @@ import {
   type ExpenseDetail,
   type InvestmentData,
   type AINewsSource,
+  type ScrapedItem,
 } from "@shared/schema";
 import { and, eq, desc, sql } from "drizzle-orm";
 
@@ -497,6 +499,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching AI News:", error);
       res.status(500).json({ error: "Failed to fetch AI News" });
+    }
+  });
+
+  // Get Scraped data from the latest successful scraper_agent record
+  app.get("/api/scraped", async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      
+      // Build where conditions
+      const conditions = [
+        eq(agentData.agentName, "scraper_agent"),
+        sql`TRIM(${agentData.status}) = 'success'`,
+      ];
+      
+      if (userId) {
+        conditions.push(eq(agentData.userId, userId));
+      }
+
+      // Select the latest successful record where agent_name='scraper_agent', LIMIT 1
+      const latestRecord = await db
+        .select()
+        .from(agentData)
+        .where(and(...conditions))
+        .orderBy(desc(agentData.createdAt))
+        .limit(1);
+
+      let scrapedData: ScrapedItem[] | null = null;
+      let createdAt: Date | null = null;
+
+      // Parse agent_response JSON from the latest record
+      if (latestRecord.length > 0 && latestRecord[0].agentResponse) {
+        createdAt = latestRecord[0].createdAt;
+        try {
+          let response = latestRecord[0].agentResponse;
+          
+          // If it's a string, try to URL-decode it first
+          if (typeof response === "string") {
+            try {
+              let decoded = decodeURIComponent(response);
+              if (decoded.includes('%')) {
+                decoded = decodeURIComponent(decoded);
+              }
+              decoded = decoded.replace(/\+/g, ' ');
+              response = decoded;
+            } catch (decodeError) {
+              // Use original if decode fails
+            }
+          }
+          
+          const parsed =
+            typeof response === "string" ? JSON.parse(response) : response;
+
+          // Validate against schema
+          const validated = scrapedResponseSchema.parse(parsed);
+          scrapedData = validated.llm_summary;
+        } catch (parseError) {
+          console.error("Error parsing scraper agent_response:", parseError);
+        }
+      }
+
+      res.json({ data: scrapedData, createdAt });
+    } catch (error) {
+      console.error("Error fetching scraped data:", error);
+      res.status(500).json({ error: "Failed to fetch scraped data" });
     }
   });
 
