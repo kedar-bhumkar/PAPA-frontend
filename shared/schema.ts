@@ -168,3 +168,17 @@ export const aiNewsResponseSchema = z.object({
 export type AINewsItem = z.infer<typeof aiNewsItemSchema>;
 export type AINewsSource = z.infer<typeof aiNewsSourceSchema>;
 export type AINewsResponse = z.infer<typeof aiNewsResponseSchema>;
+
+// Scraped data structure (parsed from JSON)
+export const scrapedItemSchema = z.object({
+  title: z.string(),
+  link: z.string(),
+  summary: z.array(z.string()),
+});
+
+export const scrapedResponseSchema = z.object({
+  llm_summary: z.array(scrapedItemSchema),
+});
+
+export type ScrapedItem = z.infer<typeof scrapedItemSchema>;
+export type ScrapedResponse = z.infer<typeof scrapedResponseSchema>;
