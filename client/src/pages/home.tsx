@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { format, subDays, addDays, startOfDay } from "date-fns";
+import { LayoutGrid, Rows3 } from "lucide-react";
 import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Button } from "@/components/ui/button";
 import { type ConceptBoxProps } from "@/components/ConceptBox";
 import { type EventData, type CalendarEventData, type ExpenseItem, type InvestmentData, type ResearchItem, type AINewsResponse, type ScrapedResponse } from "@shared/schema";
 import eventBg1 from "@assets/generated_images/Event_card_gradient_background_8c68dd6e.png";
@@ -12,7 +14,12 @@ import expensesBg from "@assets/generated_images/Expenses_card_gradient_backgrou
 import investmentBg from "@assets/generated_images/Investment_card_gradient_background_8a3e8035.png";
 import researchBg from "@assets/generated_images/Research_card_gradient_background_b8c29afa.png";
 
+export type LayoutMode = "horizontal" | "vertical";
+
 export default function Home() {
+  // State for layout mode
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>("horizontal");
+  
   // State for scraped data date navigation
   const [scrapedDate, setScrapedDate] = useState<Date>(startOfDay(new Date()));
   const today = startOfDay(new Date());
@@ -267,6 +274,30 @@ export default function Home() {
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="container mx-auto relative flex items-center justify-center px-6 py-6">
+          {/* Layout Toggle - Left side */}
+          <div className="absolute left-6 flex items-center gap-1 bg-muted/50 rounded-lg p-1">
+            <Button
+              size="icon"
+              variant={layoutMode === "horizontal" ? "default" : "ghost"}
+              className="h-8 w-8"
+              onClick={() => setLayoutMode("horizontal")}
+              data-testid="button-layout-horizontal"
+              aria-label="Horizontal layout"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant={layoutMode === "vertical" ? "default" : "ghost"}
+              className="h-8 w-8"
+              onClick={() => setLayoutMode("vertical")}
+              data-testid="button-layout-vertical"
+              aria-label="Vertical layout"
+            >
+              <Rows3 className="h-4 w-4" />
+            </Button>
+          </div>
+          
           <div className="text-center">
             <h1
               className="text-5xl font-black tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent"
@@ -294,7 +325,7 @@ export default function Home() {
         {isLoading ? (
           <LoadingSkeleton />
         ) : hasAnyData ? (
-          <ConceptCarousel concepts={concepts} />
+          <ConceptCarousel concepts={concepts} layoutMode={layoutMode} />
         ) : (
           <div className="flex min-h-[400px] items-center justify-center px-8">
             <div className="text-center">

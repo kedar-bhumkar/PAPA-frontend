@@ -2,12 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ConceptBox, { type ConceptBoxProps } from "./ConceptBox";
+import { type LayoutMode } from "@/pages/home";
 
 interface ConceptCarouselProps {
   concepts: ConceptBoxProps[];
+  layoutMode?: LayoutMode;
 }
 
-export default function ConceptCarousel({ concepts }: ConceptCarouselProps) {
+export default function ConceptCarousel({ concepts, layoutMode = "horizontal" }: ConceptCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -46,6 +48,24 @@ export default function ConceptCarousel({ concepts }: ConceptCarouselProps) {
     }
   };
 
+  // Vertical layout - cards stacked with standard scrolling
+  if (layoutMode === "vertical") {
+    return (
+      <div className="flex flex-col w-full gap-6 px-4 md:px-16">
+        {concepts.map((concept, index) => (
+          <div
+            key={index}
+            className="animate-slide-in w-full flex justify-center"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <ConceptBox {...concept} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Horizontal layout - original carousel behavior
   return (
     <div className="flex flex-col w-full gap-3">
       {/* Top Navigation - Side by Side, above cards */}
