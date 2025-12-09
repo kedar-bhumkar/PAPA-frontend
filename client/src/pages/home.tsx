@@ -231,7 +231,7 @@ export default function Home() {
       title: "Scraped Insights",
       category: "Scraped Data",
       imageUrl: researchBg,
-      categoryColor: "bg-orange-500/20",
+      categoryColor: "bg-teal-500/20",
       createdAt: scrapedCreatedAt,
       items: scrapedData.llm_summary.map((item) => ({
         type: "scraped" as const,

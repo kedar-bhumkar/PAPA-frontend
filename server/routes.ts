@@ -525,7 +525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .orderBy(desc(agentData.createdAt))
         .limit(1);
 
-      let scrapedData: ScrapedItem[] | null = null;
+      let scrapedData: { llm_summary: ScrapedItem[] } | null = null;
       let createdAt: Date | null = null;
 
       // Parse agent_response JSON from the latest record
@@ -553,7 +553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // Validate against schema
           const validated = scrapedResponseSchema.parse(parsed);
-          scrapedData = validated.llm_summary;
+          scrapedData = { llm_summary: validated.llm_summary };
         } catch (parseError) {
           console.error("Error parsing scraper agent_response:", parseError);
         }

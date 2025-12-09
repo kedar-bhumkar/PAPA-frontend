@@ -485,7 +485,7 @@ export default function ConceptBox({
       title: item.title,
       link: item.link,
       badgeLabel: "Scraped Data",
-      badgeColor: "bg-orange-500/20",
+      badgeColor: "bg-teal-500/20",
       summary: item.summary,
     });
   };

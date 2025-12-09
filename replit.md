@@ -1,7 +1,7 @@
-# PAPA - Events, Calendar, Research, Expenses, Investments & AI News Showcase Application
+# PAPA - Events, Calendar, Research, Expenses, Investments, AI News & Scraped Data Showcase Application
 
 ## Overview
-A visually stunning React application designed to showcase events, calendar items, research insights, financial expenses, investment portfolios, and AI news. It fetches data from a Supabase database and presents it in an animated carousel interface. The application features a modern design with dark/light theme support, smooth animations, and a distinctive gradient title, aiming to provide a clear and engaging overview of personal data.
+A React application showcasing events, calendar items, research insights, financial expenses, investment portfolios, AI news, and scraped data. It fetches data from a Supabase database and presents it in an animated carousel interface. The application features a modern design with dark/light theme support, smooth animations, and a distinctive gradient title, aiming to provide a clear and engaging overview of personal data. The project aims to deliver a visually stunning and highly functional application that consolidates diverse personal information into an accessible and intuitive format.
 
 ## User Preferences
 - Keep the fonts (Inter and Manrope)
@@ -23,146 +23,35 @@ A visually stunning React application designed to showcase events, calendar item
 - **Routing**: Wouter
 - **Data Fetching**: TanStack Query
 - **Styling**: Tailwind CSS with Shadcn/ui components
-- **Fonts**: Inter and Manrope
-- **UI/UX**: Dark/light theme, gradient title, smooth animations, responsive design, shimmer loading skeletons, dual navigation arrows (positioned at both top and bottom, side by side, show/hide based on scroll state), horizontal-only scrolling with full-height cards (calc(100vh - 200px)), "Last fetched" timestamp display on each card.
-- **Core Components**:
-    - `ConceptBox`: Displays events, calendar items, expenses, and investments with type discrimination and unique gradient backgrounds. Full-height cards (calc(100vh - 200px)) with overflow-y-auto and CSS-hidden scrollbars (maintains scrolling functionality while appearing scrollbar-free). **"Last fetched:" timestamp** displayed in top RHS of each card, formatted in CST timezone with am/pm (e.g., "Nov 13, 2025 • 3:32 pm"). **Gmail links for AI News**: Each AI News source item displays an ExternalLink icon linking to Gmail inbox using message_id when available (format: `https://mail.google.com/mail/u/0/#inbox/<message_id>`).
-    - `ExpenseItemComponent`: Handles expandable/collapsible expense categories with independent state and smooth animations.
-    - `ConceptCarousel`: Manages horizontal scrolling with dual navigation arrows at top and bottom positions. Each position has left and right arrows side by side, centered horizontally. Arrows intelligently appear/disappear based on scroll state using opacity transitions.
-    - `ThemeToggle`: For dark/light mode switching.
+- **UI/UX**: Dark/light theme, gradient title, smooth animations, responsive design, shimmer loading skeletons, dual navigation arrows (top and bottom, side-by-side, dynamic visibility), horizontal-only scrolling with full-height cards, "Last fetched" timestamp (CST timezone) on each card. Gmail links for AI News when `message_id` is available.
+- **Core Components**: `ConceptBox` (for displaying diverse data types with unique gradients and full-height cards), `ExpenseItemComponent` (expandable expense categories), `ConceptCarousel` (horizontal scrolling with dynamic navigation), `ThemeToggle`.
+- **Feature Specifics**:
+    - **Research Card**: Displays task and result. Truncated result with hover-to-expand. Maximize2 icon opens a full-screen dialog modal with formatted content (headings, lists, hyperlinks, paragraph splitting).
+    - **Calendar Card**: Displays CST time, summary, and optional research notes with hover-to-expand.
+    - **Expenses Card**: Expandable categories with detailed line items, sorted by amount.
+    - **Investments Card**: Displays US and India current balances and 12-month projections. Includes an "Investment Advice" section with hover-to-expand text. Currency values are pre-formatted from the API.
+    - **AI News Card**: Displays a summary section (truncated, hover-to-expand, modal for full text) and source-grouped items (truncated, hover-to-expand, modal for all items from source). Hyperlinks are automatically detected. Uses `FormattedResearchContent` for enhanced text display in modals.
+    - **Scraped Data Card**: Displays title, external link, and summary. Truncated summary with hover-to-expand. Maximize2 icon opens a full-screen dialog modal with formatted content.
+    - **Card Theming**: Visually distinct cards for different data types using gradient backgrounds (e.g., events: purple-pink, AI news: blue, scraped data: teal-cyan).
+    - **Reusable Components**: `TruncatedReveal` for consistent truncate-hover patterns.
 
 ### Backend
 - **Server**: Express.js
 - **Database**: Supabase (PostgreSQL)
 - **ORM**: Drizzle ORM with postgres-js driver
-- **API Response Structure**: All endpoints return `{ data: T, createdAt: Date | null }`
-  - `data`: The actual content (events, calendar items, expenses, etc.)
-  - `createdAt`: Timestamp from `agent_output.created_at` field for "Last fetched" display
-- **Data Format**: 
-  - Events and Calendar agents return data wrapped in `{events: [...]}` structure
-  - Calendar date format: "2025-10-29 10:00 am" (parsed with backwards compatibility for ISO format)
-- **User Filtering**: 
-  - All API endpoints accept optional `userId` query parameter (e.g., `?userId=demo`)
-  - Filters `agent_output` table by `user_id` column when provided
-  - Backward compatible - works without userId parameter
-- **AI News JSON Processing**: Special handling for malformed JSON from database
-  - URL-decodes response (handles `%28`, `%29`, and other encoded characters)
-  - Replaces `+` with spaces (URL encoding artifact)
-  - Adds missing closing brackets if JSON ends with `"}]}`  (should be `"}]]}}`)
-
-### Features
-- Real-time data fetching for events, calendar, research, expenses, and investments.
-- Optimized queries to retrieve the latest successful record for each data type.
-- JSON parsing from the `agent_response` column with robust error handling.
-- Display of events with date, location, name, and optional URLs.
-- Display of calendar items with formatted CST date/time, summary, and optional research notes:
-  - **Research property**: Optional field that provides additional context about calendar events
-  - Displays with FileSearch icon when present
-  - Hover-to-expand functionality: Initially shows 2 lines, expands on hover to show full content
-  - Smooth 200ms transitions between truncated and expanded states
-- Display of research items with task and result:
-  - **Research card**: Displays research agent insights from `research_agent`
-  - JSON structure (new format): `{"tasks": [{"task":"", "result": ""}]}`
-  - Backward compatible with legacy format: `[{"task":"", "result": ""}]`
-  - Shows task title prominently with truncated result preview (2 lines)
-  - Hover-to-expand functionality: Expands on hover to show full result text
-  - Maximize2 icon button positioned with z-index to remain visible and clickable even when text expands
-  - **Pop-up modal feature**: Maximize2 icon on each research item opens a dialog modal
-    - Dialog overlays cards and covers 80% of viewport (width and height)
-    - **Visual styling matches card design**: Purple gradient background (`bg-gradient-to-br from-purple-500/10 via-card to-card`), backdrop blur effects, and card-style borders
-    - **Sticky header**: Research badge and title remain at top while scrolling
-    - **Content container**: Rounded container with `bg-card/30` and `backdrop-blur-sm` matching card item styling
-    - **Enhanced text formatting** via FormattedResearchContent component:
-      - Detects and formats section headings (ending with colons, numbered, etc.) as bold with larger text
-      - Automatically splits long continuous text into readable paragraphs (2-3 sentences each)
-      - Renders bullet points (-, •, *) with colored bullet markers and indentation
-      - Renders numbered lists (1., 2., 3., etc.) with colored numbers and indentation
-      - Handles standalone numbered markers (numbers on separate lines) by combining with next line
-      - **Automatic hyperlink detection**: URLs (http://, https://, www.) are automatically converted to clickable links
-        - Links open in new tab with security attributes (target="_blank", rel="noopener noreferrer")
-        - Styled in primary color with underline and hover effect
-        - Trailing punctuation (.,;)]}!?) automatically stripped from URLs
-      - Proper spacing between sections and paragraphs for improved readability
-      - Works for both structured text with headings and unstructured continuous text
-    - Displays full research task as prominent title and complete result text
-    - Visible vertical scrollbars when content overflows
-    - Closes via ESC key, backdrop click, or close button
-  - Smooth 200ms transitions between truncated and expanded states
-  - Purple gradient background (bg-purple-500/20)
-  - Zod schema validation for data integrity
-- Comprehensive financial overview including salary, expenses, subscriptions, investments, and savings, with category-specific icons.
-- **Expandable expense categories** with detailed line-item breakdowns:
-  - Click any expense category (except Salary) to expand and view detailed line items
-  - Smooth collapsible animations with rotating chevron icons
-  - Details sorted by amount in descending order
-  - Independent expand/collapse state per category
-  - Multiple categories can be expanded simultaneously
-- **Investment portfolio display** with current balances and projections:
-  - **US Current Balance**: Amex (CreditCard icon), Vanguard (LineChart icon), Crypto (Bitcoin icon), Stocks (BarChart3 icon)
-    - Individual account balances displayed as pre-formatted strings (e.g., "$2203,357.00")
-    - Total US from us_current_balance.total field
-  - **India Current Balance**: Savings (Landmark icon), Stocks (BarChart3 icon), FD (Vault icon), RD (Repeat icon)
-    - Individual account balances displayed as pre-formatted strings (e.g., "₹440,000.00")
-    - Total India from india_current_balance.total field
-    - Empty string values (e.g., RD: "") are filtered out from display
-  - **12-Month Projection section** showing future investment values:
-    - US Investments: Projected balance displayed as pre-formatted string (e.g., "$287,631.96")
-    - India Investments: Projected balance displayed as pre-formatted string (e.g., "₹6,336,609.00")
-    - Clean horizontal layout with clear labels
-  - **Investment Advice section** with hover-to-expand functionality:
-    - Shows detailed financial advice for US and India investments
-    - Initially displays 2 lines of text (truncated with ellipsis)
-    - Hover directly over advice text to expand and view full content
-    - Smooth 200ms transitions between truncated and expanded states
-    - Uses direct hover (not group-hover) for reliable interaction
-  - Currency values: All amounts come pre-formatted from API with currency symbols ($, ₹), comma separators, and decimal places already included. No client-side formatting is applied.
-- Backend transformation layer that filters, sorts, and formats expense data
-- **AI News display** with summary and source-grouped items:
-  - **Summary section**: Displayed first in highlighted blue box with border
-    - Shows truncated summary (2 lines) with inline hover-to-expand functionality
-    - Expand button (Maximize2 icon) opens modal with full formatted summary
-    - Preserves clickable hyperlinks in both truncated and expanded views
-  - **Source-grouped items**: News items grouped by source (ai-news, dailydoseofds, demetrios)
-    - Shows source name with Gmail link icon (when message_id exists) and concatenated preview of item titles/details (2 lines)
-    - **Gmail inbox link**: ExternalLink icon appears next to source name linking to `https://mail.google.com/mail/u/0/#inbox/<message_id>` when message_id is present (same icon as Events card)
-    - Hover-to-expand reveals full preview inline
-    - Expand button (Maximize2 icon) opens modal with all items from that source
-    - Hyperlinks automatically detected and clickable in preview
-  - **Summary modal**: Clicking summary expand button opens dedicated modal
-    - Modal title: "AI News Summary"
-    - Modal badge: "AI News Summary" with blue color scheme (bg-blue-500/20)
-    - Full summary text displayed with FormattedResearchContent
-    - Automatic hyperlink detection, headings, lists, and paragraph formatting
-  - **Source-level modal**: Clicking source expand button opens modal showing ALL items
-    - Modal title: Source name with Gmail link icon when message_id exists
-    - **Gmail link in modal**: ExternalLink icon appears in modal header next to source name, linking to Gmail inbox
-    - Modal badge: "AI News • {source}" with blue color scheme
-    - All items displayed with individual title + formatted details
-    - Uses FormattedResearchContent for hyperlinks, headings, lists, and formatting
-  - **Unified modal architecture**: Single dialog component handles research and AI news
-    - Discriminated union (DetailDialogState) for type-safe modal content
-    - Research type: Shows single task + result
-    - AI News Summary type: Shows full summary text
-    - AI News Source type: Shows all items from selected source
-  - **TruncatedReveal component**: Reusable component for consistent truncate-hover pattern
-    - Accepts React nodes to preserve hyperlinks and formatting
-    - Used across Research, AI News summary, and AI News source previews
-    - 2-line truncation with smooth hover expansion (200ms transitions)
-  - Blue gradient background (bg-blue-500/20) for visual distinction
-  - JSON structure: `{summary: string, details: [{source: string, item_details: [{title, details}]}]}`
-- Clickable external links that open in new tabs.
-- Automatic CST timezone conversion for calendar events.
-- Type-safe discriminated unions for robust data handling.
-- Visually distinct cards for events (purple-pink), calendar (blue-teal-cyan), research (purple-violet-pink), expenses (amber-green), investments (emerald-teal), and AI news (blue).
+- **API Response Structure**: All endpoints return `{ data: T, createdAt: Date | null }`, where `createdAt` is from `agent_output.created_at`.
+- **Data Format**: Events and Calendar data wrapped in `{events: [...]}`. Calendar dates support "YYYY-MM-DD HH:MM am/pm" and ISO formats.
+- **User Filtering**: Optional `userId` query parameter for filtering data from the `agent_output` table.
+- **AI News Processing**: Handles malformed JSON from the database, including URL decoding, `+` to space conversion, and correcting missing closing brackets.
 
 ## External Dependencies
-- **Supabase**: Used as the PostgreSQL database backend.
-- **Wouter**: For client-side routing in the React application.
-- **TanStack Query (React Query)**: For data fetching, caching, and synchronization.
-- **Tailwind CSS**: For utility-first styling.
-- **Shadcn/ui**: For pre-built, customizable UI components.
-- **Lucide React**: For icons (e.g., DollarSign, Home, Tv, TrendingUp, PiggyBank).
-- **date-fns-tz**: For timezone handling and formatting of dates.
-- **Express.js**: For building the backend API.
-- **Drizzle ORM**: For interacting with the PostgreSQL database.
+- **Supabase**: PostgreSQL database backend.
+- **Wouter**: Client-side routing.
+- **TanStack Query**: Data fetching, caching, and synchronization.
+- **Tailwind CSS**: Utility-first styling.
+- **Shadcn/ui**: Customizable UI components.
+- **Lucide React**: Icon library.
+- **date-fns-tz**: Timezone handling and date formatting.
+- **Express.js**: Backend API server.
+- **Drizzle ORM**: ORM for PostgreSQL.
 - **postgres-js**: PostgreSQL client for Node.js.
