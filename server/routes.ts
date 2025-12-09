@@ -503,9 +503,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get Scraped data from the latest successful scraper_agent record
+  // Supports optional date filter (YYYY-MM-DD format) to filter by day
   app.get("/api/scraped", async (req, res) => {
     try {
       const userId = req.query.userId as string;
+      const dateFilter = req.query.date as string; // YYYY-MM-DD format
       
       // Build where conditions
       const conditions = [
@@ -515,6 +517,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
+      }
+
+      // Add date filter if provided (filter by day only)
+      if (dateFilter) {
+        conditions.push(sql`DATE(${agentData.createdAt}) = ${dateFilter}`);
       }
 
       // Select the latest successful record where agent_name='scraper_agent', LIMIT 1

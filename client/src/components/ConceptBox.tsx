@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat, FileSearch, Maximize2 } from "lucide-react";
+import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat, FileSearch, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
@@ -120,6 +121,13 @@ export interface InvestmentItem {
   };
 }
 
+export interface DateNavigation {
+  currentDate: string; // YYYY-MM-DD format
+  isToday: boolean;
+  onPrevious: () => void;
+  onNext: () => void;
+}
+
 export interface ConceptBoxProps {
   title: string;
   category: string;
@@ -127,6 +135,7 @@ export interface ConceptBoxProps {
   imageUrl?: string;
   categoryColor?: string;
   createdAt?: string | null;
+  dateNavigation?: DateNavigation;
 }
 
 // Helper function to format calendar date/time in CST
@@ -444,6 +453,7 @@ export default function ConceptBox({
   imageUrl,
   categoryColor = "bg-primary/20",
   createdAt,
+  dateNavigation,
 }: ConceptBoxProps) {
   const lastFetched = formatLastFetched(createdAt);
   const [detailDialog, setDetailDialog] = useState<DetailDialogState>(null);
@@ -512,13 +522,42 @@ export default function ConceptBox({
       <div className="relative z-10 flex h-full flex-col p-6">
         {/* Category Badge and Last Fetched */}
         <div className="mb-4 flex items-start justify-between gap-4">
-          <Badge
-            variant="secondary"
-            className={`${categoryColor} text-primary-foreground backdrop-blur-sm`}
-            data-testid={`badge-category-${category.toLowerCase()}`}
-          >
-            {category}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge
+              variant="secondary"
+              className={`${categoryColor} text-primary-foreground backdrop-blur-sm`}
+              data-testid={`badge-category-${category.toLowerCase()}`}
+            >
+              {category}
+            </Badge>
+            {/* Date Navigation Buttons */}
+            {dateNavigation && (
+              <div className="flex items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={dateNavigation.onPrevious}
+                  data-testid="button-nav-previous"
+                  aria-label="Previous day"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                {!dateNavigation.isToday && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-7 w-7"
+                    onClick={dateNavigation.onNext}
+                    data-testid="button-nav-next"
+                    aria-label="Next day"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
           {lastFetched && (
             <div className="text-xs text-muted-foreground text-right" data-testid="text-last-fetched">
               Last fetched:<br />

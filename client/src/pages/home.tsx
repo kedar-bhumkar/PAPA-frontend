@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { format, subDays, addDays, startOfDay } from "date-fns";
 import ConceptCarousel from "@/components/ConceptCarousel";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -11,6 +13,11 @@ import investmentBg from "@assets/generated_images/Investment_card_gradient_back
 import researchBg from "@assets/generated_images/Research_card_gradient_background_b8c29afa.png";
 
 export default function Home() {
+  // State for scraped data date navigation
+  const [scrapedDate, setScrapedDate] = useState<Date>(startOfDay(new Date()));
+  const today = startOfDay(new Date());
+  const isScrapedDateToday = scrapedDate.getTime() === today.getTime();
+  const scrapedDateStr = format(scrapedDate, "yyyy-MM-dd");
   // Get userId from URL query parameters
   const searchParams = new URLSearchParams(window.location.search);
   const userId = searchParams.get('userId');
@@ -78,9 +85,12 @@ export default function Home() {
   });
 
   const { data: scrapedResponse, isLoading: scrapedLoading } = useQuery<{ data: ScrapedResponse | null, createdAt: string | null }>({
-    queryKey: ["/api/scraped", userId],
+    queryKey: ["/api/scraped", userId, scrapedDateStr],
     queryFn: async () => {
-      const response = await fetch(buildQueryUrl("/api/scraped"));
+      let url = buildQueryUrl("/api/scraped");
+      // Add date parameter
+      url += url.includes('?') ? `&date=${scrapedDateStr}` : `?date=${scrapedDateStr}`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch scraped data");
       return response.json();
     },
@@ -225,20 +235,28 @@ export default function Home() {
     });
   }
 
-  // Add Scraped Data card if we have scraped data items
-  if (scrapedData && scrapedData.llm_summary && scrapedData.llm_summary.length > 0) {
+  // Add Scraped Data card with date navigation
+  // Show the card even if empty when navigating dates (so user can navigate back)
+  const scrapedHasData = scrapedData && scrapedData.llm_summary && scrapedData.llm_summary.length > 0;
+  if (scrapedHasData || !isScrapedDateToday) {
     concepts.push({
-      title: "Scraped Insights",
+      title: scrapedHasData ? "Scraped Insights" : `No data for ${format(scrapedDate, "MMM d, yyyy")}`,
       category: "Scraped Data",
       imageUrl: researchBg,
       categoryColor: "bg-teal-500/20",
       createdAt: scrapedCreatedAt,
-      items: scrapedData.llm_summary.map((item) => ({
+      dateNavigation: {
+        currentDate: scrapedDateStr,
+        isToday: isScrapedDateToday,
+        onPrevious: () => setScrapedDate(subDays(scrapedDate, 1)),
+        onNext: () => setScrapedDate(addDays(scrapedDate, 1)),
+      },
+      items: scrapedHasData ? scrapedData.llm_summary.map((item) => ({
         type: "scraped" as const,
         title: item.title,
         link: item.link,
         summary: item.summary,
-      })),
+      })) : [],
     });
   }
 

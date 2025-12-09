@@ -31,7 +31,7 @@ A React application showcasing events, calendar items, research insights, financ
     - **Expenses Card**: Expandable categories with detailed line items, sorted by amount.
     - **Investments Card**: Displays US and India current balances and 12-month projections. Includes an "Investment Advice" section with hover-to-expand text. Currency values are pre-formatted from the API.
     - **AI News Card**: Displays a summary section (truncated, hover-to-expand, modal for full text) and source-grouped items (truncated, hover-to-expand, modal for all items from source). Hyperlinks are automatically detected. Uses `FormattedResearchContent` for enhanced text display in modals.
-    - **Scraped Data Card**: Displays title, external link, and summary. Truncated summary with hover-to-expand. Maximize2 icon opens a full-screen dialog modal with formatted content.
+    - **Scraped Data Card**: Displays title, external link, and summary. Truncated summary with hover-to-expand. Maximize2 icon opens a full-screen dialog modal with bullet-pointed content. Includes left/right date navigation buttons to browse data by day (filters on `created_at` column). Right button hidden when viewing today's data.
     - **Card Theming**: Visually distinct cards for different data types using gradient backgrounds (e.g., events: purple-pink, AI news: blue, scraped data: teal-cyan).
     - **Reusable Components**: `TruncatedReveal` for consistent truncate-hover patterns.
 
