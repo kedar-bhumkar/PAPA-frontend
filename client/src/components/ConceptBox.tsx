@@ -532,7 +532,7 @@ export default function ConceptBox({
             </Badge>
             {/* Date Navigation Buttons */}
             {dateNavigation && (
-              <div className="flex items-center gap-1">
+              <div className="relative z-30 flex items-center gap-1">
                 <Button
                   type="button"
                   size="icon"
