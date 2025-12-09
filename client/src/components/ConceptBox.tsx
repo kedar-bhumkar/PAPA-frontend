@@ -7,7 +7,7 @@ import { format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
 
-export type ConceptItem = EventItem | CalendarItem | ExpenseItem | InvestmentItem | ResearchItem | AINewsSummaryItem | AINewsSourceItem;
+export type ConceptItem = EventItem | CalendarItem | ExpenseItem | InvestmentItem | ResearchItem | AINewsSummaryItem | AINewsSourceItem | ScrapedDataItem;
 
 export interface EventItem {
   type: "event";
@@ -46,12 +46,19 @@ export interface AINewsSourceItem {
   message_id?: string;
 }
 
+export interface ScrapedDataItem {
+  type: "scraped";
+  title: string;
+  link: string;
+  summary: string[];
+}
+
 export interface ExpenseDetail {
   label: string;
   amount: number;
 }
 
-// Unified detail dialog state for expandable items (research, AI news, etc.)
+// Unified detail dialog state for expandable items (research, AI news, scraped, etc.)
 type DetailDialogState = {
   kind: "research";
   title: string;
@@ -70,6 +77,13 @@ type DetailDialogState = {
   badgeColor: string;
   items: Array<{ title: string; details: string }>;
   message_id?: string;
+} | {
+  kind: "scraped";
+  title: string;
+  link: string;
+  badgeLabel: string;
+  badgeColor: string;
+  summary: string[];
 } | null;
 
 export interface ExpenseItem {
@@ -465,6 +479,17 @@ export default function ConceptBox({
     });
   };
   
+  const openScrapedDetail = (item: ScrapedDataItem) => {
+    setDetailDialog({
+      kind: "scraped",
+      title: item.title,
+      link: item.link,
+      badgeLabel: "Scraped Data",
+      badgeColor: "bg-orange-500/20",
+      summary: item.summary,
+    });
+  };
+  
   return (
     <>
     <Card
@@ -779,6 +804,39 @@ export default function ConceptBox({
                 </div>
               ) : item.type === "expense" ? (
                 <ExpenseItemComponent item={item} index={index} />
+              ) : item.type === "scraped" ? (
+                <>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="text-base font-semibold text-card-foreground">
+                          {item.title}
+                        </div>
+                        <a
+                          href={item.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
+                          data-testid={`link-scraped-${index}`}
+                          aria-label="Visit source link"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </div>
+                      <TruncatedReveal clampLines={3} testId={`text-scraped-summary-${index}`}>
+                        {renderTextWithLinks(item.summary.join(' '))}
+                      </TruncatedReveal>
+                    </div>
+                    <button
+                      onClick={() => openScrapedDetail(item)}
+                      className="relative z-10 flex-shrink-0 text-primary hover:text-primary/80 transition-colors p-1"
+                      data-testid={`button-expand-scraped-${index}`}
+                      aria-label="View full scraped data details"
+                    >
+                      <Maximize2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </>
               ) : null}
             </div>
           ))}
@@ -809,6 +867,8 @@ export default function ConceptBox({
                   ? detailDialog.title 
                   : detailDialog?.kind === "ainews-summary"
                   ? "AI News Summary"
+                  : detailDialog?.kind === "scraped"
+                  ? detailDialog.title
                   : detailDialog?.source}
               </DialogTitle>
               {detailDialog?.kind === "ainews-source" && detailDialog.message_id && (
@@ -819,6 +879,18 @@ export default function ConceptBox({
                   className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
                   data-testid="link-dialog-gmail"
                   aria-label="View in Gmail inbox"
+                >
+                  <ExternalLink className="h-5 w-5" />
+                </a>
+              )}
+              {detailDialog?.kind === "scraped" && detailDialog.link && (
+                <a
+                  href={detailDialog.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
+                  data-testid="link-dialog-scraped"
+                  aria-label="Visit source"
                 >
                   <ExternalLink className="h-5 w-5" />
                 </a>
@@ -852,6 +924,16 @@ export default function ConceptBox({
                       </div>
                     </div>
                   ))}
+                </div>
+              ) : detailDialog?.kind === "scraped" ? (
+                <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-scraped">
+                  <div className="space-y-4">
+                    {detailDialog.summary.map((paragraph, idx) => (
+                      <div key={idx} className="text-card-foreground">
+                        <FormattedResearchContent text={paragraph} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : null}
             </div>
