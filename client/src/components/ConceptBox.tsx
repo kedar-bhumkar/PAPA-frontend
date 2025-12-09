@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ExternalLink, DollarSign, Home, Tv, TrendingUp, PiggyBank, ChevronDown, CreditCard, LineChart, Bitcoin, BarChart3, Landmark, Vault, Repeat, FileSearch, Maximize2, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, parse } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export type ConceptItem = EventItem | CalendarItem | ExpenseItem | InvestmentItem | ResearchItem | AINewsSummaryItem | AINewsSourceItem | ScrapedDataItem;
 
@@ -457,6 +457,32 @@ export default function ConceptBox({
 }: ConceptBoxProps) {
   const lastFetched = formatLastFetched(createdAt);
   const [detailDialog, setDetailDialog] = useState<DetailDialogState>(null);
+  const [hasMoreContent, setHasMoreContent] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Check if content is scrollable
+  useEffect(() => {
+    const checkScrollable = () => {
+      if (scrollContainerRef.current) {
+        const { scrollHeight, clientHeight } = scrollContainerRef.current;
+        setHasMoreContent(scrollHeight > clientHeight + 10);
+      }
+    };
+    
+    checkScrollable();
+    // Recheck after content might have changed
+    const timer = setTimeout(checkScrollable, 100);
+    return () => clearTimeout(timer);
+  }, [items]);
+
+  // Update indicator on scroll
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollHeight, clientHeight, scrollTop } = scrollContainerRef.current;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+      setHasMoreContent(!isAtBottom && scrollHeight > clientHeight + 10);
+    }
+  };
   
   // Helper functions to open detail dialogs
   const openResearchDetail = (item: ResearchItem) => {
@@ -585,7 +611,11 @@ export default function ConceptBox({
         </h3>
 
         {/* Items List - Compact single-line format */}
-        <div className="flex-1 space-y-3 overflow-y-auto hide-scrollbar">
+        <div 
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          className="flex-1 space-y-3 overflow-y-auto hide-scrollbar"
+        >
           {items.map((item, index) => (
             <div
               key={index}
@@ -890,6 +920,30 @@ export default function ConceptBox({
             </div>
           ))}
         </div>
+        
+        {/* Scroll indicator - golden yellow corner when more content available */}
+        {hasMoreContent && (
+          <div 
+            className="absolute bottom-4 right-4 w-8 h-8 pointer-events-none"
+            data-testid="scroll-indicator"
+          >
+            <div 
+              className="absolute bottom-0 right-0 w-full h-full"
+              style={{
+                background: "linear-gradient(135deg, transparent 50%, rgba(234, 179, 8, 0.6) 50%)",
+                borderRadius: "0 0 8px 0",
+              }}
+            />
+            <div 
+              className="absolute bottom-1 right-1 w-3 h-3 animate-bounce"
+              style={{
+                borderRight: "2px solid rgba(234, 179, 8, 0.9)",
+                borderBottom: "2px solid rgba(234, 179, 8, 0.9)",
+                transform: "rotate(45deg)",
+              }}
+            />
+          </div>
+        )}
       </div>
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {
