@@ -51,12 +51,12 @@ export default function ConceptCarousel({ concepts, layoutMode = "horizontal" }:
   // Vertical layout - responsive grid based on screen size
   if (layoutMode === "vertical") {
     return (
-      <div className="w-full px-4 md:px-8 lg:px-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 justify-items-center">
+      <div className="w-full px-4 md:px-8 lg:px-16 py-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8 justify-items-center">
           {concepts.map((concept, index) => (
             <div
               key={index}
-              className="animate-slide-in w-full flex justify-center"
+              className="animate-slide-in w-full flex justify-center p-2"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <ConceptBox {...concept} />
