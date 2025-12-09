@@ -534,10 +534,15 @@ export default function ConceptBox({
             {dateNavigation && (
               <div className="flex items-center gap-1">
                 <Button
+                  type="button"
                   size="icon"
                   variant="ghost"
                   className="h-7 w-7"
-                  onClick={dateNavigation.onPrevious}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dateNavigation.onPrevious();
+                  }}
                   data-testid="button-nav-previous"
                   aria-label="Previous day"
                 >
@@ -545,10 +550,15 @@ export default function ConceptBox({
                 </Button>
                 {!dateNavigation.isToday && (
                   <Button
+                    type="button"
                     size="icon"
                     variant="ghost"
                     className="h-7 w-7"
-                    onClick={dateNavigation.onNext}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      dateNavigation.onNext();
+                    }}
                     data-testid="button-nav-next"
                     aria-label="Next day"
                   >
