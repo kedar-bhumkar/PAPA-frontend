@@ -927,13 +927,16 @@ export default function ConceptBox({
                 </div>
               ) : detailDialog?.kind === "scraped" ? (
                 <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-scraped">
-                  <div className="space-y-4">
+                  <ul className="space-y-3 list-none">
                     {detailDialog.summary.map((paragraph, idx) => (
-                      <div key={idx} className="text-card-foreground">
-                        <FormattedResearchContent text={paragraph} />
-                      </div>
+                      <li key={idx} className="flex items-start gap-3 text-card-foreground">
+                        <span className="text-primary mt-1.5 flex-shrink-0">•</span>
+                        <div className="flex-1">
+                          <FormattedResearchContent text={paragraph} />
+                        </div>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               ) : null}
             </div>
