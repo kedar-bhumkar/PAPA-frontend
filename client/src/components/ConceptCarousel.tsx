@@ -47,9 +47,9 @@ export default function ConceptCarousel({ concepts }: ConceptCarouselProps) {
   };
 
   return (
-    <div className="relative w-full">
-      {/* Top Navigation - Side by Side */}
-      <div className="absolute left-1/2 -translate-x-1/2 top-4 z-20 flex gap-2">
+    <div className="flex flex-col w-full gap-3">
+      {/* Top Navigation - Side by Side, above cards */}
+      <div className="flex justify-center gap-2">
         <Button
           size="icon"
           variant="default"
@@ -93,8 +93,8 @@ export default function ConceptCarousel({ concepts }: ConceptCarouselProps) {
         ))}
       </div>
 
-      {/* Bottom Navigation - Side by Side */}
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-20 flex gap-2">
+      {/* Bottom Navigation - Side by Side, below cards */}
+      <div className="flex justify-center gap-2">
         <Button
           size="icon"
           variant="default"
