@@ -921,28 +921,18 @@ export default function ConceptBox({
           ))}
         </div>
         
-        {/* Scroll indicator - golden yellow corner when more content available */}
+        {/* Scroll indicator - glowing border when more content available */}
         {hasMoreContent && (
           <div 
-            className="absolute bottom-4 right-4 w-8 h-8 pointer-events-none"
+            className="absolute bottom-0 right-0 w-12 h-12 pointer-events-none"
             data-testid="scroll-indicator"
-          >
-            <div 
-              className="absolute bottom-0 right-0 w-full h-full"
-              style={{
-                background: "linear-gradient(135deg, transparent 50%, rgba(234, 179, 8, 0.6) 50%)",
-                borderRadius: "0 0 8px 0",
-              }}
-            />
-            <div 
-              className="absolute bottom-1 right-1 w-3 h-3 animate-bounce"
-              style={{
-                borderRight: "2px solid rgba(234, 179, 8, 0.9)",
-                borderBottom: "2px solid rgba(234, 179, 8, 0.9)",
-                transform: "rotate(45deg)",
-              }}
-            />
-          </div>
+            style={{
+              borderRight: "3px solid rgba(234, 179, 8, 0.8)",
+              borderBottom: "3px solid rgba(234, 179, 8, 0.8)",
+              borderRadius: "0 0 12px 0",
+              boxShadow: "0 0 12px rgba(234, 179, 8, 0.6), 0 0 24px rgba(234, 179, 8, 0.3)",
+            }}
+          />
         )}
       </div>
       <style>{`
