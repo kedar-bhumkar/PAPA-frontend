@@ -205,36 +205,6 @@ export default function Home() {
     }
   }
 
-  // Add Expenses card if we have expense items
-  if (expenseItems && expenseItems.length > 0) {
-    concepts.push({
-      title: "Financial Overview",
-      category: "Expenses",
-      imageUrl: expensesBg,
-      categoryColor: "bg-amber-500/20",
-      createdAt: expensesCreatedAt,
-      items: expenseItems.map((item) => ({
-        type: "expense" as const,
-        ...item,
-      })),
-    });
-  }
-
-  // Add Investment card if we have valid investment data
-  if (investmentData && investmentData.us_current_balance && investmentData.india_current_balance && investmentData.projection_12months) {
-    concepts.push({
-      title: "Investment Portfolio",
-      category: "Investments",
-      imageUrl: investmentBg,
-      categoryColor: "bg-emerald-500/20",
-      createdAt: investmentsCreatedAt,
-      items: [{
-        type: "investment" as const,
-        ...investmentData,
-      }],
-    });
-  }
-
   // Add Scraped Data card with date navigation
   // Show the card even if empty when navigating dates (so user can navigate back)
   const scrapedHasData = scrapedData && scrapedData.llm_summary && scrapedData.llm_summary.length > 0;
@@ -257,6 +227,36 @@ export default function Home() {
         link: item.link,
         summary: item.summary,
       })) : [],
+    });
+  }
+
+  // Add Expenses card if we have expense items (at the end)
+  if (expenseItems && expenseItems.length > 0) {
+    concepts.push({
+      title: "Financial Overview",
+      category: "Expenses",
+      imageUrl: expensesBg,
+      categoryColor: "bg-amber-500/20",
+      createdAt: expensesCreatedAt,
+      items: expenseItems.map((item) => ({
+        type: "expense" as const,
+        ...item,
+      })),
+    });
+  }
+
+  // Add Investment card if we have valid investment data (at the end)
+  if (investmentData && investmentData.us_current_balance && investmentData.india_current_balance && investmentData.projection_12months) {
+    concepts.push({
+      title: "Investment Portfolio",
+      category: "Investments",
+      imageUrl: investmentBg,
+      categoryColor: "bg-emerald-500/20",
+      createdAt: investmentsCreatedAt,
+      items: [{
+        type: "investment" as const,
+        ...investmentData,
+      }],
     });
   }
 
