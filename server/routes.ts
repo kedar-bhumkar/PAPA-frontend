@@ -226,17 +226,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get expense data from the latest successful expense_agent record
   app.get("/api/expenses", async (req, res) => {
     try {
-      const userId = req.query.userId as string;
+      const mode = req.query.mode as string;
+      // Apply user_id filter based on mode parameter
+      // mode='admin' -> user_id='ked_3142', otherwise user_id='demo'
+      const userId = mode === "admin" ? "ked_3142" : "demo";
 
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "expense_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
+        eq(agentData.userId, userId),
       ];
-
-      if (userId) {
-        conditions.push(eq(agentData.userId, userId));
-      }
 
       // Select the latest successful record where agent_name='expense_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status
@@ -279,17 +279,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get investment data from the latest successful investment_agent record
   app.get("/api/investments", async (req, res) => {
     try {
-      const userId = req.query.userId as string;
+      const mode = req.query.mode as string;
+      // Apply user_id filter based on mode parameter
+      // mode='admin' -> user_id='ked_3142', otherwise user_id='demo'
+      const userId = mode === "admin" ? "ked_3142" : "demo";
 
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "investment_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
+        eq(agentData.userId, userId),
       ];
-
-      if (userId) {
-        conditions.push(eq(agentData.userId, userId));
-      }
 
       // Select the latest successful record where agent_name='investment_agent', LIMIT 1
       // Using TRIM to handle potential newline at the end of status

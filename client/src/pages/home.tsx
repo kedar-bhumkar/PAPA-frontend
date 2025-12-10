@@ -25,14 +25,24 @@ export default function Home() {
   const today = startOfDay(new Date());
   const isScrapedDateToday = scrapedDate.getTime() === today.getTime();
   const scrapedDateStr = format(scrapedDate, "yyyy-MM-dd");
-  // Get userId from URL query parameters
+  // Get URL query parameters
   const searchParams = new URLSearchParams(window.location.search);
   const userId = searchParams.get('userId');
+  const mode = searchParams.get('mode');
   
   // Build query URL with userId parameter if present
   const buildQueryUrl = (endpoint: string) => {
     if (userId) {
       return `${endpoint}?userId=${encodeURIComponent(userId)}`;
+    }
+    return endpoint;
+  };
+  
+  // Build query URL with mode parameter for expenses/investments
+  // mode='admin' -> user_id='ked_3142', otherwise user_id='demo'
+  const buildModeQueryUrl = (endpoint: string) => {
+    if (mode) {
+      return `${endpoint}?mode=${encodeURIComponent(mode)}`;
     }
     return endpoint;
   };
@@ -56,18 +66,18 @@ export default function Home() {
   });
 
   const { data: expensesResponse, isLoading: expensesLoading } = useQuery<{ data: ExpenseItem[], createdAt: string | null }>({
-    queryKey: ["/api/expenses", userId],
+    queryKey: ["/api/expenses", mode],
     queryFn: async () => {
-      const response = await fetch(buildQueryUrl("/api/expenses"));
+      const response = await fetch(buildModeQueryUrl("/api/expenses"));
       if (!response.ok) throw new Error("Failed to fetch expenses");
       return response.json();
     },
   });
 
   const { data: investmentsResponse, isLoading: investmentsLoading } = useQuery<{ data: InvestmentData | null, createdAt: string | null }>({
-    queryKey: ["/api/investments", userId],
+    queryKey: ["/api/investments", mode],
     queryFn: async () => {
-      const response = await fetch(buildQueryUrl("/api/investments"));
+      const response = await fetch(buildModeQueryUrl("/api/investments"));
       if (!response.ok) throw new Error("Failed to fetch investments");
       return response.json();
     },
