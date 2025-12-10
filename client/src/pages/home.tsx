@@ -195,7 +195,10 @@ export default function Home() {
         aiNewsItems.push({
           type: "ainews-source" as const,
           source: sourceData.source,
-          items: sourceData.item_details,
+          items: sourceData.item_details.map((item) => ({
+            title: item.title,
+            details: Array.isArray(item.details) ? item.details : [item.details],
+          })),
           message_id: sourceData.message_id,
         });
       }
@@ -206,7 +209,7 @@ export default function Home() {
         title: "AI News",
         category: "AI News",
         imageUrl: researchBg, // Using research background temporarily
-        categoryColor: "bg-blue-500/20",
+        categoryColor: "bg-orange-500/20",
         createdAt: aiNewsCreatedAt,
         items: aiNewsItems,
       });

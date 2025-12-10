@@ -26,13 +26,13 @@ A React application showcasing events, calendar items, research insights, financ
 - **UI/UX**: Dark/light theme, gradient title, smooth animations, responsive design, shimmer loading skeletons, dual navigation arrows (top and bottom, side-by-side, dynamic visibility), horizontal-only scrolling with full-height cards, "Last fetched" timestamp (CST timezone) on each card. Gmail links for AI News when `message_id` is available.
 - **Core Components**: `ConceptBox` (for displaying diverse data types with unique gradients and full-height cards), `ExpenseItemComponent` (expandable expense categories), `ConceptCarousel` (horizontal scrolling with dynamic navigation), `ThemeToggle`.
 - **Feature Specifics**:
-    - **Research Card**: Displays task and result. Truncated result with hover-to-expand. Maximize2 icon opens a full-screen dialog modal with formatted content (headings, lists, hyperlinks, paragraph splitting).
+    - **Research Card**: Displays task and summary on card face. Truncated summary with hover-to-expand. Maximize2 icon opens a full-screen dialog modal with details array rendered as bullet points. Data format: `{task, summary, details: string[]}`.
     - **Calendar Card**: Displays CST time, summary, and optional research notes with hover-to-expand.
     - **Expenses Card**: Expandable categories with detailed line items, sorted by amount.
     - **Investments Card**: Displays US and India current balances and 12-month projections. Includes an "Investment Advice" section with hover-to-expand text. Currency values are pre-formatted from the API.
-    - **AI News Card**: Displays a summary section (truncated, hover-to-expand, modal for full text) and source-grouped items (truncated, hover-to-expand, modal for all items from source). Hyperlinks are automatically detected. Uses `FormattedResearchContent` for enhanced text display in modals.
+    - **AI News Card**: Orange-themed card. Displays a summary section (truncated, hover-to-expand, modal for full text) and source-grouped items (truncated, hover-to-expand). Modal shows details array as bullet points. Data format: `{source, message_id, item_details: [{title, details: string[], source: string[]}]}`. Hyperlinks are automatically detected.
     - **Scraped Data Card**: Displays title, external link, and summary. Truncated summary with hover-to-expand. Maximize2 icon opens a full-screen dialog modal with bullet-pointed content. Includes left/right date navigation buttons to browse data by day (filters on `created_at` column). Right button hidden when viewing today's data.
-    - **Card Theming**: Visually distinct cards for different data types using gradient backgrounds (e.g., events: purple-pink, AI news: blue, scraped data: teal-cyan).
+    - **Card Theming**: Visually distinct cards for different data types using gradient backgrounds (e.g., events: purple-pink, AI news: orange, scraped data: teal-cyan).
     - **Reusable Components**: `TruncatedReveal` for consistent truncate-hover patterns.
 
 ### Backend
