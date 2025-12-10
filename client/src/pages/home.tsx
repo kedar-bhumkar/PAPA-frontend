@@ -17,8 +17,8 @@ import researchBg from "@assets/generated_images/Research_card_gradient_backgrou
 export type LayoutMode = "horizontal" | "vertical";
 
 export default function Home() {
-  // State for layout mode
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>("horizontal");
+  // State for layout mode - default to vertical stacked grid
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>("vertical");
   
   // State for scraped data date navigation
   const [scrapedDate, setScrapedDate] = useState<Date>(startOfDay(new Date()));
