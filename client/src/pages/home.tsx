@@ -208,8 +208,9 @@ export default function Home() {
       concepts.push({
         title: "AI News",
         category: "AI News",
-        imageUrl: researchBg, // Using research background temporarily
+        imageUrl: researchBg,
         categoryColor: "bg-orange-500/20",
+        gradientColor: "from-orange-500/30 via-orange-400/15",
         createdAt: aiNewsCreatedAt,
         items: aiNewsItems,
       });

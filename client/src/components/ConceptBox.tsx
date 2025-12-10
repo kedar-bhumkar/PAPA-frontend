@@ -135,6 +135,7 @@ export interface ConceptBoxProps {
   items: ConceptItem[];
   imageUrl?: string;
   categoryColor?: string;
+  gradientColor?: string; // e.g., "from-orange-500/20" for tinted card background
   createdAt?: string | null;
   dateNavigation?: DateNavigation;
 }
@@ -453,6 +454,7 @@ export default function ConceptBox({
   items,
   imageUrl,
   categoryColor = "bg-primary/20",
+  gradientColor,
   createdAt,
   dateNavigation,
 }: ConceptBoxProps) {
@@ -500,7 +502,7 @@ export default function ConceptBox({
     setDetailDialog({
       kind: "ainews-summary",
       badgeLabel: "AI News Summary",
-      badgeColor: "bg-orange-500/20",
+      badgeColor: "bg-primary/20",
       content: item.summary,
     });
   };
@@ -510,7 +512,7 @@ export default function ConceptBox({
       kind: "ainews-source",
       source: item.source,
       badgeLabel: `AI News • ${item.source}`,
-      badgeColor: "bg-orange-500/20",
+      badgeColor: "bg-primary/20",
       items: item.items,
       message_id: item.message_id,
     });
@@ -541,8 +543,12 @@ export default function ConceptBox({
             alt={title}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/90 to-card/40" />
+          <div className={`absolute inset-0 bg-gradient-to-t from-card via-card/90 to-card/40`} />
         </div>
+      )}
+      {/* Optional color tint overlay */}
+      {gradientColor && (
+        <div className={`absolute inset-0 z-0 bg-gradient-to-br ${gradientColor} to-transparent`} />
       )}
 
       {/* Content */}
@@ -706,9 +712,9 @@ export default function ConceptBox({
                 </>
               ) : item.type === "ainews-summary" ? (
                 <>
-                  <div className="bg-orange-500/10 border border-orange-500/20 rounded-md p-3">
+                  <div className="bg-primary/10 border border-primary/20 rounded-md p-3">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="text-xs font-semibold uppercase tracking-wider text-orange-500">
+                      <div className="text-xs font-semibold uppercase tracking-wider text-primary">
                         Summary
                       </div>
                       <button
@@ -730,7 +736,7 @@ export default function ConceptBox({
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="text-xs font-medium uppercase tracking-wider text-orange-500">
+                        <div className="text-xs font-medium uppercase tracking-wider text-primary">
                           {item.source}
                         </div>
                         {item.message_id && (
@@ -738,7 +744,7 @@ export default function ConceptBox({
                             href={`https://mail.google.com/mail/u/0/#inbox/${item.message_id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-shrink-0 text-orange-500 hover:text-orange-400 transition-colors"
+                            className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors"
                             data-testid={`link-ainews-gmail-${index}`}
                             aria-label="View in Gmail inbox"
                           >
@@ -1040,7 +1046,7 @@ export default function ConceptBox({
                       <ul className="space-y-3">
                         {item.details.map((detail, detailIdx) => (
                           <li key={detailIdx} className="flex items-start gap-3">
-                            <span className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-orange-500" />
+                            <span className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-primary" />
                             <span className="text-muted-foreground leading-relaxed">
                               {renderTextWithLinks(detail)}
                             </span>
