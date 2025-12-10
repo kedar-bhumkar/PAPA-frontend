@@ -349,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .orderBy(desc(agentData.createdAt))
         .limit(1);
 
-      let researchItems: Array<{ task: string; result: string }> = [];
+      let researchItems: Array<{ task: string; summary: string; details: string[] }> = [];
       let createdAt: Date | null = null;
 
       // Parse agent_response JSON from the latest record
@@ -363,9 +363,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // Handle both new format {"tasks": [...]} and legacy format [...]
           if (Array.isArray(parsed)) {
-            // Legacy format: plain array
+            // Legacy format: plain array with task/result
             console.log("Research agent response using legacy array format");
-            researchItems = parsed;
+            researchItems = parsed.map((item: { task: string; result?: string; summary?: string; details?: string[] }) => ({
+              task: item.task,
+              summary: item.summary || item.result || "",
+              details: item.details || [],
+            }));
           } else {
             // New format: wrapped in tasks object
             const researchData = researchResponseSchema.parse(parsed);

@@ -170,7 +170,8 @@ export default function Home() {
       items: researchItems.map((researchItem) => ({
         type: "research" as const,
         task: researchItem.task,
-        result: researchItem.result,
+        summary: researchItem.summary,
+        details: researchItem.details || [],
       })),
     });
   }

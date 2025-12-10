@@ -29,7 +29,8 @@ export interface CalendarItem {
 export interface ResearchItem {
   type: "research";
   task: string;
-  result: string;
+  summary: string;
+  details: string[];
 }
 
 export interface AINewsSummaryItem {
@@ -65,7 +66,7 @@ type DetailDialogState = {
   title: string;
   badgeLabel: string;
   badgeColor: string;
-  content: string;
+  details: string[];
 } | {
   kind: "ainews-summary";
   badgeLabel: string;
@@ -491,7 +492,7 @@ export default function ConceptBox({
       title: item.task,
       badgeLabel: "Research",
       badgeColor: "bg-purple-500/20",
-      content: item.result,
+      details: item.details,
     });
   };
   
@@ -689,8 +690,8 @@ export default function ConceptBox({
                       <div className="text-base font-semibold text-card-foreground mb-2">
                         {item.task}
                       </div>
-                      <TruncatedReveal clampLines={2} testId={`text-result-${index}`}>
-                        {renderTextWithLinks(item.result)}
+                      <TruncatedReveal clampLines={2} testId={`text-summary-${index}`}>
+                        {renderTextWithLinks(item.summary || "")}
                       </TruncatedReveal>
                     </div>
                     <button
@@ -1011,8 +1012,17 @@ export default function ConceptBox({
           <DialogDescription asChild>
             <div className="mt-6 pb-4">
               {detailDialog?.kind === "research" ? (
-                <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-result">
-                  <FormattedResearchContent text={detailDialog.content} />
+                <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-details">
+                  <ul className="space-y-3">
+                    {detailDialog.details.map((detail, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-2 h-2 mt-2 rounded-full bg-purple-500" />
+                        <span className="text-muted-foreground leading-relaxed">
+                          {renderTextWithLinks(detail)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ) : detailDialog?.kind === "ainews-summary" ? (
                 <div className="rounded-md bg-card/30 p-6 backdrop-blur-sm" data-testid="text-dialog-summary">
