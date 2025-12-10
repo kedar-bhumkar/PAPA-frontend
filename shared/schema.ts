@@ -150,9 +150,10 @@ export type ResearchItem = z.infer<typeof researchItemSchema>;
 export type ResearchResponse = z.infer<typeof researchResponseSchema>;
 
 // AI News data structure (parsed from JSON)
+// details can be either a string (old format) or array of strings (new format)
 export const aiNewsItemSchema = z.object({
   title: z.string(),
-  details: z.array(z.string()),
+  details: z.union([z.string(), z.array(z.string())]),
   source: z.array(z.string()).optional(),
 });
 

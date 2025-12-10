@@ -457,42 +457,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           // Handle case where agentResponse might already be parsed or is a string
           let response = latestRecord[0].agentResponse;
-          let originalResponse = response;
           
-          // If it's a string, try to URL-decode it first in case it contains encoded characters
-          if (typeof response === "string") {
+          // If it's already an object, use it directly
+          if (typeof response === "object" && response !== null) {
+            aiNewsData = aiNewsResponseSchema.parse(response);
+          } else if (typeof response === "string") {
+            let decoded = response;
+            
+            // Try to URL-decode if needed
             try {
-              // Try double-decoding in case it was encoded twice
-              let decoded = decodeURIComponent(response);
-              // Check if there are still encoded characters
               if (decoded.includes('%')) {
                 decoded = decodeURIComponent(decoded);
+                if (decoded.includes('%')) {
+                  decoded = decodeURIComponent(decoded);
+                }
               }
-              
-              // Fix common JSON formatting issues
-              // Replace + characters with spaces (from URL encoding)
-              decoded = decoded.replace(/\+/g, ' ');
-              
-              // Fix incomplete JSON - add missing closing brackets if needed
-              if (decoded.endsWith('"}]}')) {
-                decoded = decoded + ']}';
-              }
-              
-              response = decoded;
             } catch (decodeError) {
-              // If decoding fails, use the original string
               console.warn("Could not URL-decode AI news response, using original");
             }
+            
+            // Fix common JSON issues
+            decoded = decoded.replace(/\+/g, ' ');
+            
+            // Try parsing directly first
+            try {
+              const parsed = JSON.parse(decoded);
+              aiNewsData = aiNewsResponseSchema.parse(parsed);
+            } catch (jsonError) {
+              // Try to salvage what we can - extract valid JSON structure
+              console.warn("Initial JSON parse failed, attempting recovery...");
+              
+              // Try to find and parse just the valid portion
+              const summaryMatch = decoded.match(/"summary"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+              const detailsMatch = decoded.match(/"details"\s*:\s*\[/);
+              
+              if (summaryMatch && detailsMatch) {
+                // Build a minimal valid structure from what we can extract
+                const summary = summaryMatch[1];
+                
+                // Try to extract sources and their items
+                const sources: Array<{source: string, message_id?: string, item_details: Array<{title: string, details: string | string[]}>}> = [];
+                const sourceRegex = /"source"\s*:\s*"([^"]+)"/g;
+                let sourceMatch;
+                
+                while ((sourceMatch = sourceRegex.exec(decoded)) !== null) {
+                  // Skip if it's the source array inside item_details
+                  const beforeMatch = decoded.substring(Math.max(0, sourceMatch.index - 50), sourceMatch.index);
+                  if (!beforeMatch.includes('"source":')) {
+                    sources.push({
+                      source: sourceMatch[1],
+                      item_details: []
+                    });
+                  }
+                }
+                
+                if (sources.length > 0) {
+                  aiNewsData = { summary, details: sources };
+                  console.log("Recovered partial AI news data with", sources.length, "sources");
+                }
+              }
+            }
           }
-          
-          const parsed =
-            typeof response === "string" ? JSON.parse(response) : response;
-
-          // Validate against schema
-          aiNewsData = aiNewsResponseSchema.parse(parsed);
         } catch (parseError) {
           console.error("Error parsing ainews agent_response:", parseError);
-          // Log more details about the error
           if (typeof latestRecord[0].agentResponse === 'string') {
             console.error("Original JSON around position 8863:", latestRecord[0].agentResponse.substring(8850, 8900));
           }
