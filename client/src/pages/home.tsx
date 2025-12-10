@@ -218,9 +218,9 @@ export default function Home() {
   }
 
   // Add Scraped Data card with date navigation
-  // Show the card even if empty when navigating dates (so user can navigate back)
+  // Always show the card so users can navigate to previous days even when today has no data
   const scrapedHasData = scrapedData && scrapedData.llm_summary && scrapedData.llm_summary.length > 0;
-  if (scrapedHasData || !isScrapedDateToday) {
+  {
     concepts.push({
       title: scrapedHasData ? "Scraped Insights" : `No data for ${format(scrapedDate, "MMM d, yyyy")}`,
       category: "Scraped Data",
