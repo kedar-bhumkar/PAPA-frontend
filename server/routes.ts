@@ -232,9 +232,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = mode === "admin" ? "ked_3142" : "demo";
 
       // Build where conditions
+      // Use BTRIM with explicit newline/space characters since TRIM() only removes spaces
       const conditions = [
         eq(agentData.agentName, "expense_agent"),
-        sql`TRIM(${agentData.status}) = 'success'`,
+        sql`BTRIM(${agentData.status}, E' \n\r\t') = 'success'`,
         eq(agentData.userId, userId),
       ];
 
@@ -285,9 +286,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = mode === "admin" ? "ked_3142" : "demo";
 
       // Build where conditions
+      // Use BTRIM with explicit newline/space characters since TRIM() only removes spaces
       const conditions = [
         eq(agentData.agentName, "investment_agent"),
-        sql`TRIM(${agentData.status}) = 'success'`,
+        sql`BTRIM(${agentData.status}, E' \n\r\t') = 'success'`,
         eq(agentData.userId, userId),
       ];
 
