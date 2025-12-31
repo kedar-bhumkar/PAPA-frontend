@@ -332,13 +332,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/research", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      
+
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "research_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
       ];
-      
+
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
       }
@@ -351,7 +351,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .orderBy(desc(agentData.createdAt))
         .limit(1);
 
-      let researchItems: Array<{ task: string; summary: string; details: string[] }> = [];
+      let researchItems: Array<{
+        task: string;
+        summary: string;
+        details: string[];
+      }> = [];
       let createdAt: Date | null = null;
 
       // Parse agent_response JSON from the latest record
@@ -367,11 +371,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (Array.isArray(parsed)) {
             // Legacy format: plain array with task/result
             console.log("Research agent response using legacy array format");
-            researchItems = parsed.map((item: { task: string; result?: string; summary?: string; details?: string[] }) => ({
-              task: item.task,
-              summary: item.summary || item.result || "",
-              details: item.details || [],
-            }));
+            researchItems = parsed.map(
+              (item: {
+                task: string;
+                result?: string;
+                summary?: string;
+                details?: string[];
+              }) => ({
+                task: item.task,
+                summary: item.summary || item.result || "",
+                details: item.details || [],
+              }),
+            );
           } else {
             // New format: wrapped in tasks object
             const researchData = researchResponseSchema.parse(parsed);
@@ -393,12 +404,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/ainews/debug", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      
+
       const conditions = [
         eq(agentData.agentName, "ainews_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
       ];
-      
+
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
       }
@@ -412,11 +423,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (latestRecord.length > 0) {
         const response = latestRecord[0].agentResponse;
-        res.json({ 
+        res.json({
           raw: response,
           type: typeof response,
-          length: typeof response === 'string' ? response.length : 'N/A',
-          preview: typeof response === 'string' ? response.substring(8850, 8900) : 'N/A'
+          length: typeof response === "string" ? response.length : "N/A",
+          preview:
+            typeof response === "string"
+              ? response.substring(8850, 8900)
+              : "N/A",
         });
       } else {
         res.json({ error: "No records found" });
@@ -431,13 +445,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/ainews", async (req, res) => {
     try {
       const userId = req.query.userId as string;
-      
+
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "ainews_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
       ];
-      
+
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
       }
@@ -459,28 +473,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           // Handle case where agentResponse might already be parsed or is a string
           let response = latestRecord[0].agentResponse;
-          
+
           // If it's already an object, use it directly
           if (typeof response === "object" && response !== null) {
             aiNewsData = aiNewsResponseSchema.parse(response);
           } else if (typeof response === "string") {
             let decoded = response;
-            
+
             // Try to URL-decode if needed
             try {
-              if (decoded.includes('%')) {
+              if (decoded.includes("%")) {
                 decoded = decodeURIComponent(decoded);
-                if (decoded.includes('%')) {
+                if (decoded.includes("%")) {
                   decoded = decodeURIComponent(decoded);
                 }
               }
             } catch (decodeError) {
-              console.warn("Could not URL-decode AI news response, using original");
+              console.warn(
+                "Could not URL-decode AI news response, using original",
+              );
             }
-            
+
             // Fix common JSON issues
-            decoded = decoded.replace(/\+/g, ' ');
-            
+            decoded = decoded.replace(/\+/g, " ");
+
             // Try parsing directly first
             try {
               const parsed = JSON.parse(decoded);
@@ -488,42 +504,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } catch (jsonError) {
               // Try to salvage what we can - extract valid JSON structure
               console.warn("Initial JSON parse failed, attempting recovery...");
-              
+
               // Try to find and parse just the valid portion
-              const summaryMatch = decoded.match(/"summary"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+              const summaryMatch = decoded.match(
+                /"summary"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/,
+              );
               const detailsMatch = decoded.match(/"details"\s*:\s*\[/);
-              
+
               if (summaryMatch && detailsMatch) {
                 // Build a minimal valid structure from what we can extract
                 const summary = summaryMatch[1];
-                
+
                 // Try to extract sources and their items
-                const sources: Array<{source: string, message_id?: string, item_details: Array<{title: string, details: string | string[]}>}> = [];
+                const sources: Array<{
+                  source: string;
+                  message_id?: string;
+                  item_details: Array<{
+                    title: string;
+                    details: string | string[];
+                  }>;
+                }> = [];
                 const sourceRegex = /"source"\s*:\s*"([^"]+)"/g;
                 let sourceMatch;
-                
+
                 while ((sourceMatch = sourceRegex.exec(decoded)) !== null) {
                   // Skip if it's the source array inside item_details
-                  const beforeMatch = decoded.substring(Math.max(0, sourceMatch.index - 50), sourceMatch.index);
+                  const beforeMatch = decoded.substring(
+                    Math.max(0, sourceMatch.index - 50),
+                    sourceMatch.index,
+                  );
                   if (!beforeMatch.includes('"source":')) {
                     sources.push({
                       source: sourceMatch[1],
-                      item_details: []
+                      item_details: [],
                     });
                   }
                 }
-                
+
                 if (sources.length > 0) {
                   aiNewsData = { summary, details: sources };
-                  console.log("Recovered partial AI news data with", sources.length, "sources");
+                  console.log(
+                    "Recovered partial AI news data with",
+                    sources.length,
+                    "sources",
+                  );
                 }
               }
             }
           }
         } catch (parseError) {
           console.error("Error parsing ainews agent_response:", parseError);
-          if (typeof latestRecord[0].agentResponse === 'string') {
-            console.error("Original JSON around position 8863:", latestRecord[0].agentResponse.substring(8850, 8900));
+          if (typeof latestRecord[0].agentResponse === "string") {
+            console.error(
+              "Original JSON around position 8863:",
+              latestRecord[0].agentResponse.substring(8850, 8900),
+            );
           }
         }
       }
@@ -541,20 +576,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.query.userId as string;
       const dateFilter = req.query.date as string; // YYYY-MM-DD format
-      
+
       // Build where conditions
       const conditions = [
         eq(agentData.agentName, "scraper_agent"),
         sql`TRIM(${agentData.status}) = 'success'`,
       ];
-      
+
       if (userId) {
         conditions.push(eq(agentData.userId, userId));
       }
 
       // Add date filter if provided (filter by day only)
       if (dateFilter) {
-        conditions.push(sql`DATE(${agentData.createdAt}) = ${dateFilter}`);
+        conditions.push(
+          sql`DATE(${agentData.createdAt} AT TIME ZONE 'America/Chicago') = ${dateFilter}`,
+        );
       }
 
       // Select the latest successful record where agent_name='scraper_agent', LIMIT 1
@@ -573,21 +610,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt = latestRecord[0].createdAt;
         try {
           let response = latestRecord[0].agentResponse;
-          
+
           // If it's a string, try to URL-decode it first
           if (typeof response === "string") {
             try {
               let decoded = decodeURIComponent(response);
-              if (decoded.includes('%')) {
+              if (decoded.includes("%")) {
                 decoded = decodeURIComponent(decoded);
               }
-              decoded = decoded.replace(/\+/g, ' ');
+              decoded = decoded.replace(/\+/g, " ");
               response = decoded;
             } catch (decodeError) {
               // Use original if decode fails
             }
           }
-          
+
           const parsed =
             typeof response === "string" ? JSON.parse(response) : response;
 
